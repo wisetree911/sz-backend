@@ -3,7 +3,7 @@ from app.core.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 
-class AssetsModel(Base):
+class Asset(Base):
     __tablename__ = "assets"
 
     id: Mapped[int] = mapped_column(primary_key=True)

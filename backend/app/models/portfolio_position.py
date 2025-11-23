@@ -4,7 +4,7 @@ from app.core.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 
-class PortfolioPositionModel(Base):
+class PortfolioPosition(Base):
     __tablename__ = "portfolio_positions"
 
     id: Mapped[int] = mapped_column(primary_key=True)

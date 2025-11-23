@@ -1,23 +1,23 @@
 from sqlalchemy import select
-from app.models.asset import AssetsModel
+from app.models.asset import Asset
 from app.schemas.asset import AssetSchema
-class AssetsRepository:
+class AssetRepository:
     @staticmethod
     async def get_all(session):
-        query = select(AssetsModel)
+        query = select(Asset)
         result = await session.execute(query)
         return result.scalars().all()
     
     @staticmethod
     async def get_one(asset_id: int, session):
-        query = select(AssetsModel).where(AssetsModel.id == asset_id)
+        query = select(Asset).where(Asset.id == asset_id)
         result = await session.execute(query)
         asset = result.scalar_one_or_none()
         return asset
     
     @staticmethod
     async def create(session, ticker: str, full_name: str, type: str):
-        new_asset = AssetsModel(
+        new_asset = Asset(
             ticker=ticker, 
             full_name=full_name,
             type=type
@@ -28,7 +28,7 @@ class AssetsRepository:
         return new_asset
     
     @staticmethod
-    async def delete(session, asset: AssetsModel):
+    async def delete(session, asset: Asset):
         await session.delete(asset)
         await session.commit()
     
