@@ -3,6 +3,12 @@ from app.models.user import User
 
 class UserRepository:
     @staticmethod
+    async def get_all(session):
+        query = select(User)
+        result = await session.execute(query)
+        return result.scalars().all()
+    
+    @staticmethod
     async def get_one(user_id: int, session):
         query = select(User).where(User.id == user_id)
         result = await session.execute(query)
@@ -14,7 +20,7 @@ class UserRepository:
         new_user = User(
             name=name, 
             age=age
-            )
+        )
         session.add(new_user)
         await session.commit()
         await session.refresh(new_user) # достать + айдишник от бд
@@ -25,8 +31,4 @@ class UserRepository:
         await session.delete(user)
         await session.commit()
     
-    @staticmethod
-    async def get_all(session):
-        query = select(User)
-        result = await session.execute(query)
-        return result.scalars().all()
+    

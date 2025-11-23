@@ -12,7 +12,24 @@ class PortfolioRepository:
     async def get_by_id(session, portfolio_id: int):
         query = select(Portfolio).where(Portfolio.id == portfolio_id)
         result = await session.execute(query)
-        return result.scalar_one_or_none()
+        portfolio = result.scalar_one_or_none()
+        return portfolio
     
+    @staticmethod
+    async def create(session, user_id: int, name: str):
+        new_portfolio = Portfolio(
+            user_id=user_id,
+            name=name
+        )
+        session.add(new_portfolio)
+        await session.commit()
+        await session.refresh(new_portfolio)
+        return new_portfolio
+    
+    @staticmethod
+    async def delete(session, portfolio: Portfolio):
+        await session.delete(portfolio)
+        await session.commit()
+
     
 
