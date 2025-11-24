@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status
-from app.schemas.portfolio_position import PortfolioPositionScheme
+from app.schemas.portfolio_position import PortfolioPositionCreate
 from app.core.database import SessionDep
 from app.services.portfolio_positions import PortfolioPositionService
 
@@ -18,7 +18,7 @@ async def get_portfolio_positions(session: SessionDep):
     return await PortfolioPositionService.get_all(session=session)
 
 @router.post("/")
-async def create_portfolio_position(session: SessionDep, portfolio_position_schema: PortfolioPositionScheme):
+async def create_portfolio_position(session: SessionDep, portfolio_position_schema: PortfolioPositionCreate):
     return await PortfolioPositionService.create(
         session=session,
         portfolio_position_schema=portfolio_position_schema

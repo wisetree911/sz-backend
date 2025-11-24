@@ -3,23 +3,23 @@ from fastapi import status
 from fastapi import APIRouter
 from app.core.database import SessionDep
 from app.services.assets import AssetService
-from app.schemas.asset import AssetSchema
+from app.schemas.asset import AssetCreate, AssetResponse
 router = APIRouter(prefix="/assets", tags=["Assets"])
 
-@router.get("/")
+@router.get("/", response_model=list[AssetResponse])
 async def get_assets(session: SessionDep):
     return await AssetService.get_all(session=session)
 
-@router.get("/by-ticker/{ticker}")
+@router.get("/by-ticker/{ticker}", response_model=AssetResponse)
 async def get_asset_by_ticker(session: SessionDep, ticker: str):
     return await AssetService.get_by_ticker(session=session, ticker=ticker)
 
-@router.get("/{asset_id}")
+@router.get("/{asset_id}", response_model=AssetResponse)
 async def get_asset_by_id(session: SessionDep, asset_id: int):
     return await AssetService.get_by_id(session=session, asset_id=asset_id)
 
-@router.post("/")
-async def create_asset(session: SessionDep, asset_schema: AssetSchema):
+@router.post("/", response_model=AssetResponse)
+async def create_asset(session: SessionDep, asset_schema: AssetCreate):
     return await AssetService.create(session=session, asset_schema=asset_schema)
 
 @router.delete("/{asset_id}", status_code=status.HTTP_204_NO_CONTENT)
