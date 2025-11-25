@@ -21,3 +21,7 @@ async def delete_by_id(session: SessionDep, portfolio_id: int):
     await PortfolioService.delete(session=session, portfolio_id=portfolio_id)
     return
 
+@router.get("/user/{user_id}")
+async def get_user_portfolios(session: SessionDep, user_id: int):
+    return await PortfolioService.get_user_portfolios(session=session, user_id=user_id)
+

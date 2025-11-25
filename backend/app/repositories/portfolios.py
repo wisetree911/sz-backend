@@ -31,5 +31,11 @@ class PortfolioRepository:
         await session.delete(portfolio)
         await session.commit()
 
+    @staticmethod
+    async def get_by_user_id(session, user_id: int):
+        query = select(Portfolio).where(Portfolio.user_id == user_id)
+        result = await session.execute(query)
+        portfolios = result.scalars().all()
+        return portfolios
     
 

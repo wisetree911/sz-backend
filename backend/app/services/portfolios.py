@@ -30,6 +30,11 @@ class PortfolioService:
         
         await PortfolioRepository.delete(session=session, portfolio=portfolio)
     
+    @staticmethod
+    async def get_user_portfolios(session, user_id: int):
+        return await PortfolioRepository.get_by_user_id(session=session, user_id=user_id)
 
 
 # сделать получение всей инфы по всем портфелям (с дждоинами) юзера либо по конкретному портфелю (чисто айди портфеля)
+
+
