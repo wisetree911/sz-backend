@@ -1,4 +1,3 @@
-from sqlalchemy import select, func
 from datetime import datetime, timedelta
 from backend.app.repositories.asset_prices import AssetPriceRepository
 from backend.app.repositories.portfolios import PortfolioRepository
@@ -9,7 +8,7 @@ class AnalyticsService:
     async def portfolio_dynamics(session, user_id: int):
         portfolios = await PortfolioRepository.get_by_user_id(session=session, user_id=user_id)
 
-        portfolios_list = []
+        response = []
         for portfolio in portfolios:
             positions = await PortfolioPositionRepository.get_by_portfolio_id(session=session, portfolio_id=portfolio.id)
 
@@ -23,17 +22,10 @@ class AnalyticsService:
             for price in prices:
                 ts = price.timestamp
                 asset_id = price.asset_id
-
-                if ts not in time_map:
-                    time_map[ts] = 0
-
+                if ts not in time_map: time_map[ts] = 0
                 time_map[ts] += price.price * pos_dict[asset_id]
-            portfolio_dict = {}
-            portfolio_dict["name"] = portfolio.name
-            portfolio_dict["id"] = portfolio.id
             
-            ls = []
-            ls = [
+            data = [
                     {
                         "timestamp": ts.isoformat(),
                         "value": float(val)
@@ -41,10 +33,12 @@ class AnalyticsService:
                     for ts, val in sorted(time_map.items(), key=lambda x: x[0])
                 ]
             
-            portfolio_dict["data"] = ls
-            portfolios_list.append(portfolio_dict)
+            response.append({
+                "id" : portfolio.id,
+                "name" : portfolio.name,
+                "data" : data
+            })
             
-
-        return portfolios_list
+        return response
 
 
