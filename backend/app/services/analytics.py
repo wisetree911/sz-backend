@@ -1,37 +1,23 @@
-
-
 from sqlalchemy import select, func
 from datetime import datetime, timedelta
-from backend.app.models.portfolio import Portfolio
-from backend.app.models.asset_price import AssetPrice
-from backend.app.models.portfolio_position import PortfolioPosition
-
+from backend.app.repositories.asset_prices import AssetPriceRepository
+from backend.app.repositories.portfolios import PortfolioRepository
+from backend.app.repositories.portfolio_positions import PortfolioPositionRepository
 class AnalyticsService:
 
     @staticmethod
     async def portfolio_dynamics(session, user_id: int):
-        q1 = select(Portfolio).where(Portfolio.user_id == user_id)
-        portfolios = (await session.execute(q1)).scalars().all()
-        
+        portfolios = await PortfolioRepository.get_by_user_id(session=session, user_id=user_id)
+
         portfolios_list = []
         for portfolio in portfolios:
-
-            q2 = select(PortfolioPosition).where(
-                PortfolioPosition.portfolio_id == portfolio.id
-            )
-            positions = (await session.execute(q2)).scalars().all()
+            positions = await PortfolioPositionRepository.get_by_portfolio_id(session=session, portfolio_id=portfolio.id)
 
             asset_ids = [p.asset_id for p in positions]
             pos_dict = {p.asset_id: p.quantity for p in positions}
 
             since = datetime.utcnow() - timedelta(hours=24)
-            q3 = select(AssetPrice).where(
-                AssetPrice.asset_id.in_(asset_ids),
-                AssetPrice.timestamp >= since
-            ).order_by(AssetPrice.timestamp)
-
-            prices = (await session.execute(q3)).scalars().all()
-
+            prices = await AssetPriceRepository.get_prices_since(session=session, ids=asset_ids, since=since)
             time_map = {}
 
             for price in prices:
