@@ -17,12 +17,11 @@ class AssetPrice(Base):
         default="RUB",
         nullable=False
     )
+
     source: Mapped[str] = mapped_column(
         Text,
         default="moex",
         nullable=False
     )
-    timestamp: Mapped[datetime] = mapped_column(
-        DateTime,
-        nullable=False
-    )
+
+    timestamp: Mapped[datetime] = mapped_column(default=datetime.utcnow)

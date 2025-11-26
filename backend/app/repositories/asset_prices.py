@@ -15,4 +15,21 @@ class AssetPriceRepository:
         asserts = result.scalars().all()
         return asserts
     
+    @staticmethod
+    async def add_price(session,
+            asset_id,
+            price,
+            currency,
+            source):
+        new_price = AssetPrice(
+            asset_id=asset_id,
+            price=price,
+            currency=currency,
+            source=source
+        )
+        session.add(new_price)
+        await session.commit()
+        await session.refresh(new_price)
+        return new_price
+    
     
