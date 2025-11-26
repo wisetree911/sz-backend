@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.models.asset_price import AssetPrice
+from backend.app.models.asset_price import AssetPrice
 
 class AssetPriceRepository:
     @staticmethod

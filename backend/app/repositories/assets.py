@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.models.asset import Asset
+from backend.app.models.asset import Asset
 
 class AssetRepository:
     @staticmethod

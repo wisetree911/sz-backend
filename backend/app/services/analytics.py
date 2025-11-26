@@ -1,7 +1,7 @@
-from app.repositories.users import User
-from app.repositories.assets import Asset
-from app.repositories.portfolios import Portfolio
-from app.repositories.portfolio_positions import PortfolioPosition
+from backend.app.repositories.users import User
+from backend.app.repositories.assets import Asset
+from backend.app.repositories.portfolios import Portfolio
+from backend.app.repositories.portfolio_positions import PortfolioPosition
 
 # GET /users/{user_id}/portfolio/analytics
 #     — обобщённая аналитика (вес позиций, total value)

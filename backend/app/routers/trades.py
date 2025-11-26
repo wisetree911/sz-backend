@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
-from app.schemas.trade import TradeCreate, TradeResponse
-from app.core.database import SessionDep
-from app.services.trades import TradeService
+from backend.app.schemas.trade import TradeCreate, TradeResponse
+from backend.app.core.database import SessionDep
+from backend.app.services.trades import TradeService
 
 router = APIRouter(prefix="/trades", tags=["Trades"])
 

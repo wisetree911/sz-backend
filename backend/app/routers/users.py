@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
-from app.schemas.user import UserCreate, UserResponse
-from app.core.database import SessionDep
-from app.services.users import UserService
+from backend.app.schemas.user import UserCreate, UserResponse
+from backend.app.core.database import SessionDep
+from backend.app.services.users import UserService
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
