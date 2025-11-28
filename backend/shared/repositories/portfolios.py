@@ -3,17 +3,17 @@ from shared.models.portfolio import Portfolio
 
 class PortfolioRepository:
     @staticmethod
-    async def get_all(session):
-        query = select(Portfolio)
-        result = await session.execute(query)
-        return result.scalars().all()
-    
-    @staticmethod
     async def get_by_id(session, portfolio_id: int):
         query = select(Portfolio).where(Portfolio.id == portfolio_id)
         result = await session.execute(query)
         portfolio = result.scalar_one_or_none()
         return portfolio
+    
+    @staticmethod
+    async def get_all(session):
+        query = select(Portfolio)
+        result = await session.execute(query)
+        return result.scalars().all()
     
     @staticmethod
     async def create(session, user_id: int, name: str):

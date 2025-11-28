@@ -3,17 +3,17 @@ from shared.models.trade import Trade
 
 class TradeRepository:
     @staticmethod
-    async def get_all(session):
-        query = select(Trade)
-        result = await session.execute(query)
-        return result.scalars().all()
-    
-    @staticmethod
     async def get_by_id(trade_id: int, session):
         query = select(Trade).where(Trade.id == trade_id)
         result = await session.execute(query)
         trade = result.scalar_one_or_none()
         return trade
+    
+    @staticmethod
+    async def get_all(session):
+        query = select(Trade)
+        result = await session.execute(query)
+        return result.scalars().all()
     
     @staticmethod
     async def create(session, portfolio_id: int, asset_id: int, direction: str, quantity: int, price: int):

@@ -3,17 +3,17 @@ from shared.models.asset import Asset
 
 class AssetRepository:
     @staticmethod
-    async def get_all(session):
-        query = select(Asset)
-        result = await session.execute(query)
-        return result.scalars().all()
-    
-    @staticmethod
     async def get_by_id(asset_id: int, session):
         query = select(Asset).where(Asset.id == asset_id)
         result = await session.execute(query)
         asset = result.scalar_one_or_none()
         return asset
+    
+    @staticmethod
+    async def get_all(session):
+        query = select(Asset)
+        result = await session.execute(query)
+        return result.scalars().all()
     
     @staticmethod
     async def get_by_ticker(ticker: str, session):
