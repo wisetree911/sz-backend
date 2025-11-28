@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from backend.app.repositories.asset_prices import AssetPriceRepository
-from backend.app.repositories.portfolios import PortfolioRepository
-from backend.app.repositories.portfolio_positions import PortfolioPositionRepository
+from shared.repositories.asset_prices import AssetPriceRepository
+from shared.repositories.portfolios import PortfolioRepository
+from shared.repositories.portfolio_positions import PortfolioPositionRepository
 class AnalyticsService:
 
     @staticmethod

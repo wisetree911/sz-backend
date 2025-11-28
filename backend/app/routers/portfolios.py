@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
-from backend.app.schemas.portfolio import PortfolioCreate, PortfolioResponse
-from backend.app.core.database import SessionDep
-from backend.app.services.portfolios import PortfolioService
+from app.schemas.portfolio import PortfolioCreate, PortfolioResponse
+from app.core.database import SessionDep
+from app.services.portfolios import PortfolioService
 router = APIRouter(prefix="/portfolios", tags=["Portfolios"])
 
 @router.get("/", response_model=list[PortfolioResponse])

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
-from backend.app.schemas.portfolio_position import PortfolioPositionCreate
-from backend.app.core.database import SessionDep
-from backend.app.services.portfolio_positions import PortfolioPositionService
+from app.schemas.portfolio_position import PortfolioPositionCreate
+from app.core.database import SessionDep
+from app.services.portfolio_positions import PortfolioPositionService
 
 router = APIRouter(prefix="/portfolio_positions", tags=["Portfolio Positions"])
 

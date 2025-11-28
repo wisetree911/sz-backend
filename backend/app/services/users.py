@@ -1,4 +1,4 @@
-from backend.app.repositories.users import UserRepository
+from shared.repositories.users import UserRepository
 
 from fastapi import HTTPException
 

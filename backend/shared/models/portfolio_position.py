@@ -1,22 +1,19 @@
-from sqlalchemy import Text, ForeignKey, DateTime, Numeric
-from backend.app.core.database import Base
+
+from sqlalchemy import ForeignKey, DateTime, Numeric, UniqueConstraint
+from app.core.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 
-class Trade(Base):
-    __tablename__ = "trades"
-
+class PortfolioPosition(Base):
+    __tablename__ = "portfolio_positions"
+    __table_args__ = (UniqueConstraint("portfolio_id", "asset_id", name="uix_portfolio_asset"),)
     id: Mapped[int] = mapped_column(primary_key=True)
     portfolio_id: Mapped[int] = mapped_column(
         ForeignKey("portfolios.id", ondelete="CASCADE")
     )
     asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
-    direction: Mapped[str] = mapped_column(Text)  # buy / sell
     quantity: Mapped[float] = mapped_column(Numeric, nullable=False)
-    price: Mapped[float] = mapped_column(Numeric, nullable=False)
-    trade_time: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow
-    )
+    avg_price: Mapped[float] = mapped_column(Numeric, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow
     )

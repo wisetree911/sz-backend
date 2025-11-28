@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from backend.app.models.user import User
+from shared.models.user import User
 
 class UserRepository:
     @staticmethod

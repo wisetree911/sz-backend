@@ -1,9 +1,9 @@
 # TODO: make endpoints ко всем хуйням описанным в айпаде (юри норм сделать тоже по ресту)
 from fastapi import status
 from fastapi import APIRouter
-from backend.app.core.database import SessionDep
-from backend.app.services.assets import AssetService
-from backend.app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate
+from app.core.database import SessionDep
+from app.services.assets import AssetService
+from app.schemas.asset import AssetCreate, AssetResponse, AssetUpdate
 router = APIRouter(prefix="/assets", tags=["Assets"])
 
 @router.get("/", response_model=list[AssetResponse])

@@ -1,5 +1,5 @@
 from sqlalchemy import Text, Integer, DateTime
-from backend.app.core.database import Base
+from app.core.database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 

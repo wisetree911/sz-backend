@@ -1,4 +1,4 @@
-from backend.app.repositories.assets import AssetRepository
+from shared.repositories.assets import AssetRepository
 
 from fastapi import HTTPException
 

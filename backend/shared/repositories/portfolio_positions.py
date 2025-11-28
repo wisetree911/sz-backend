@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from backend.app.models.portfolio_position import PortfolioPosition
+from shared.models.portfolio_position import PortfolioPosition
 
 class PortfolioPositionRepository:
     @staticmethod

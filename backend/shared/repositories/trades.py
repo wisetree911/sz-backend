@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from backend.app.models.trade import Trade
+from shared.models.trade import Trade
 
 class TradeRepository:
     @staticmethod

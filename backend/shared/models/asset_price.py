@@ -1,7 +1,7 @@
 from sqlalchemy import Text, DateTime, ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
-from backend.app.core.database import Base
+from app.core.database import Base
 
 class AssetPrice(Base):
     __tablename__ = "asset_prices"

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from backend.app.core.database import SessionDep
-from backend.app.services.analytics import AnalyticsService
+from app.core.database import SessionDep
+from app.services.analytics import AnalyticsService
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
 
