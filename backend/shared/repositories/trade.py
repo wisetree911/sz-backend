@@ -1,10 +1,11 @@
 from requests import session
 from sqlalchemy import select
 from shared.models.trade import Trade
-from sqlalchemy.ext.asyncio import AsyncConnection
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.schemas.trade import TradeCreate, TradeUpdate
 
 class TradeRepository:
-    def __init__(self, session: AsyncConnection):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def get_by_id(self, trade_id: int):
@@ -18,21 +19,23 @@ class TradeRepository:
         result = await self.session.execute(query)
         return result.scalars().all()
     
-    async def create(self, portfolio_id: int, asset_id: int, direction: str, quantity: int, price: int):
-        new_trade = Trade(
-            portfolio_id=portfolio_id,
-            asset_id=asset_id,
-            direction=direction,
-            quantity=quantity,
-            price=price
-        )
-        self.session.add(new_trade)
+    async def create(self, obj_in: TradeCreate):
+        obj=Trade(**obj_in.dict())
+        self.session.add(obj)
         await self.session.commit()
-        await self.session.refresh(new_trade) # достать + айдишник от бд
-        return new_trade
-    
+        await self.session.refresh(obj)
+        return obj
+
     async def delete(self, trade: Trade):
         await self.session.delete(trade)
         await self.session.commit()
     
+    async def update(self, trade: Trade, obj_in: TradeUpdate):
+        update_data=obj_in.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(trade, field, value)
+        await self.session.commit()
+        await self.session.refresh(trade)
+        return trade
+
     
