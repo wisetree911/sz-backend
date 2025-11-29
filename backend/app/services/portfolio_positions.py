@@ -1,39 +1,36 @@
 from shared.repositories.portfolio_position import PortfolioPositionRepository
-
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
 class PortfolioPositionService:
-    @staticmethod
-    async def get_all(session):
-        return await PortfolioPositionRepository.get_all(session=session)
+    def __init__(self, session: AsyncSession):
+        self.session = session
+        self.repo = PortfolioPositionRepository(session=session)
+
+    async def get_all(self):
+        return await self.repo.get_all()
     
-    @staticmethod
-    async def get_by_id(session, portfolio_position_id: int):
-        portfolio_position = await PortfolioPositionRepository.get_by_id(
-            session=session,
+    async def get_by_id(self, portfolio_position_id: int):
+        portfolio_position = await self.repo.get_by_id(
             portflio_position_id=portfolio_position_id
         )
         if portfolio_position is None:
             raise HTTPException(404, "SZ portfolio position not found")
         return portfolio_position
     
-    @staticmethod
-    async def create(session, portfolio_position_schema): # там аккуратно сам постгрес настроен что чекает зависимости и наличие айдишников
-        return await PortfolioPositionRepository.create(
-            session=session,
+    async def create(self, portfolio_position_schema):
+        return await self.repo.create(
             portfolio_id=portfolio_position_schema.portfolio_id,
             asset_id=portfolio_position_schema.asset_id,
             quantity=portfolio_position_schema.quantity,
             avg_price=portfolio_position_schema.avg_price
         )
     
-    @staticmethod
-    async def delete(session, portfolio_position_id: int):
-        portfolio_position = await PortfolioPositionRepository.get_by_id(
-            session=session, 
+    async def delete(self, portfolio_position_id: int):
+        portfolio_position = await self.repo.get_by_id(
             portflio_position_id=portfolio_position_id
             )
         if portfolio_position is None:
             raise HTTPException(404, "SZ portfolio position not found")
         
-        await PortfolioPositionRepository.delete(session=session, portfolio_position=portfolio_position)
+        await self.repo.delete(portfolio_position=portfolio_position)
