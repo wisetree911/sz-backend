@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from shared.repositories.asset_price import AssetPriceRepository
 from shared.repositories.portfolio import PortfolioRepository
 from shared.repositories.portfolio_position import PortfolioPositionRepository
+
 class AnalyticsService:
     @staticmethod
     async def portfolio_dynamics(session, user_id: int):

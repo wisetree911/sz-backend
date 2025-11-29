@@ -1,4 +1,3 @@
-# TODO: make endpoints ко всем хуйням описанным в айпаде (юри норм сделать тоже по ресту)
 from fastapi import Depends, status
 from fastapi import APIRouter
 from app.core.database import SessionDep

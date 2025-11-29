@@ -7,27 +7,22 @@ class AssetRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_id(self, asset_id: int):
-        query = select(Asset).where(Asset.id == asset_id)
-        result = await self.session.execute(query)
-        return result.scalar_one_or_none()
+    async def create(self, obj_in: AssetCreate):
+        obj=Asset(**obj_in.dict())
+        self.session.add(obj)
+        await self.session.commit()
+        await self.session.refresh(obj)    
+        return obj
     
     async def get_all(self):
         query = select(Asset)
         result = await self.session.execute(query)
         return result.scalars().all()
     
-    async def get_by_ticker(self, ticker: str):
-        query = select(Asset).where(Asset.ticker == ticker)
+    async def get_by_id(self, asset_id: int):
+        query = select(Asset).where(Asset.id == asset_id)
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
-    
-    async def create(self, obj_in: AssetCreate):
-        obj = Asset(**obj_in.dict())
-        self.session.add(obj)
-        await self.session.commit()
-        await self.session.refresh(obj)    
-        return obj
     
     async def update(self, asset: Asset, obj_in: AssetUpdate):
         update_data=obj_in.dict(exclude_unset=True)
@@ -40,4 +35,15 @@ class AssetRepository:
     async def delete(self, asset: Asset):
         await self.session.delete(asset)
         await self.session.commit()
+    
+    async def get_by_ticker(self, ticker: str):
+        query = select(Asset).where(Asset.ticker == ticker)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
+    
+    
+    
+    
+    
+    
     

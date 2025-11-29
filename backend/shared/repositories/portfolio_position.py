@@ -2,26 +2,27 @@ from sqlalchemy import select
 from shared.models.portfolio_position import PortfolioPosition
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.portfolio_position import PortfolioPositionUpdate, PortfolioPositionCreate
+
 class PortfolioPositionRepository:
     def __init__(self, session: AsyncSession):
         self.session=session
 
-    async def get_by_id(self, portflio_position_id: int):
-        query = select(PortfolioPosition).where(PortfolioPosition.id == portflio_position_id)
-        result = await self.session.execute(query)
-        return result.scalar_one_or_none()
+    async def create(self, obj_in: PortfolioPositionCreate):
+        obj=PortfolioPosition(**obj_in.dict())
+        self.session.add(obj)
+        await self.session.commit()
+        await self.session.refresh(obj)
+        return obj
     
     async def get_all(self):
         query = select(PortfolioPosition)
         result = await self.session.execute(query)
         return result.scalars().all()
     
-    async def create(self, obj_in: PortfolioPositionCreate):
-        obj = PortfolioPosition(**obj_in.dict())
-        self.session.add(obj)
-        await self.session.commit()
-        await self.session.refresh(obj)
-        return obj
+    async def get_by_id(self, portflio_position_id: int):
+        query = select(PortfolioPosition).where(PortfolioPosition.id == portflio_position_id)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
     
     async def update(self, portfolio_position: PortfolioPosition, obj_in: PortfolioPositionUpdate):
         update_data=obj_in.dict(exclude_unset=True)

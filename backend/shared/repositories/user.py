@@ -7,28 +7,23 @@ class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_id(self, user_id: int):
-        query = select(User).where(User.id == user_id)
-        result = await self.session.execute(query)
-        user = result.scalar_one_or_none()
-        return user
+    async def create(self, obj_in: UserCreate):
+        obj=User(**obj_in.dict())
+        self.session.add(obj)
+        await self.session.commit()
+        await self.session.refresh(obj)
+        return obj
     
     async def get_all(self):
         query = select(User)
         result = await self.session.execute(query)
         return result.scalars().all()
-    
-    async def create(self, obj_in: UserCreate):
-        obj = User(**obj_in.dict())
-        self.session.add(obj)
-        await self.session.commit()
-        await self.session.refresh(obj) # достать + айдишник от бд
-        return obj
-    
-    async def delete(self, user: User):
-        await self.session.delete(user)
-        await self.session.commit()
 
+    async def get_by_id(self, user_id: int):
+        query = select(User).where(User.id == user_id)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
+    
     async def update(self, user: User, obj_in: UserUpdate):
         update_data=obj_in.dict(exclude_unset=True)
         for field, value in update_data.items():
@@ -36,5 +31,11 @@ class UserRepository:
         await self.session.commit()
         await self.session.refresh(user)
         return user
+    
+    async def delete(self, user: User):
+        await self.session.delete(user)
+        await self.session.commit()
+
+    
     
     

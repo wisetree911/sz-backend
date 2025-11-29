@@ -10,7 +10,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
              summary="Get detailed user info by user_id"
              )
 async def get_user(user_id: int, service: UserService=Depends(get_user_service)):
-    return await service.get_user_by_id(user_id=user_id)
+    return await service.get_by_id(user_id=user_id)
 
 @router.get("/", 
             response_model=list[UserResponse], 
@@ -24,7 +24,7 @@ async def get_users(service: UserService=Depends(get_user_service)):
              summary="Create user"
              )
 async def create_user(payload: UserCreate, service: UserService=Depends(get_user_service)):
-    return await service.create_user(obj_in=payload)
+    return await service.create(obj_in=payload)
 
 @router.delete("/{user_id}", 
                status_code=status.HTTP_204_NO_CONTENT, 

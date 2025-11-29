@@ -2,32 +2,28 @@ from sqlalchemy import select
 from shared.models.portfolio import Portfolio
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.portfolio import PortfolioCreate, PortfolioUpdate
+
 class PortfolioRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
         
-    async def get_by_id(self, portfolio_id: int):
-        query = select(Portfolio).where(Portfolio.id == portfolio_id)
-        result = await self.session.execute(query)
-        portfolio = result.scalar_one_or_none()
-        return portfolio
+    async def create(self, obj_in: PortfolioCreate):
+        obj=Portfolio(**obj_in.dict())
+        self.session.add(obj)
+        await self.session.commit()
+        await self.session.refresh(obj)
+        return obj
     
     async def get_all(self):
         query = select(Portfolio)
         result = await self.session.execute(query)
         return result.scalars().all()
     
-    async def create(self, obj_in: PortfolioCreate):
-        obj = Portfolio(**obj_in.dict())
-        self.session.add(obj)
-        await self.session.commit()
-        await self.session.refresh(obj)
-        return obj
+    async def get_by_id(self, portfolio_id: int):
+        query = select(Portfolio).where(Portfolio.id == portfolio_id)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
     
-    async def delete(self, portfolio: Portfolio):
-        await self.session.delete(portfolio)
-        await self.session.commit()
-
     async def update(self, portfolio: Portfolio, obj_in: PortfolioUpdate):
         update_data=obj_in.dict(exclude_unset=True)
         for field, value in update_data.items():
@@ -36,6 +32,10 @@ class PortfolioRepository:
         await self.session.refresh(portfolio)
         return portfolio
     
+    async def delete(self, portfolio: Portfolio):
+        await self.session.delete(portfolio)
+        await self.session.commit()
+
     async def get_by_user_id(self, user_id: int):
         query = select(Portfolio).where(Portfolio.user_id == user_id)
         result = await self.session.execute(query)
