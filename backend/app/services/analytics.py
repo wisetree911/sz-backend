@@ -18,9 +18,17 @@ class AnalyticsService:
 
     async def portfolio_snapshot(self, portfolio_id: int): # добавить округление и реально выводить топ три позиции и получать реально последние цены
         portfolio = await self.portfolio_repo.get_by_id(portfolio_id=portfolio_id)
+        if portfolio is None: raise HTTPException(404, "SZ portfolio not found")
         positions = await self.portfolio_position_repo.get_by_portfolio_id(portfolio_id)
-        tops=list()
-        if not positions: raise HTTPException(404, "SZ no positions were found")
+        if not positions: return PortfolioShapshotResponse(portfolio_id=portfolio_id, 
+                                                           name=portfolio.name,
+                                                           total_value=0,
+                                                           total_profit=0,
+                                                           total_profit_percent=0,
+                                                           invested_value=0,
+                                                           currency=portfolio.currency,
+                                                           positions_count=0,
+                                                           top_positions=[])
         total_value = int()
         asset_ids=[pos.asset_id for pos in positions]
         prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
@@ -31,6 +39,7 @@ class AnalyticsService:
         total_profit_percent = total_profit / invested_value * 100
         positions_count=len(positions)
         assets = await self.asset_repo.get_assets_dict_by_ids(asset_ids)
+        tops=list()
         for pos in positions:
             new_top = TopPosition(
                 asset_id=pos.asset_id,
@@ -44,8 +53,6 @@ class AnalyticsService:
                 profit_percent = ((prices[pos.asset_id] - pos.avg_price) / pos.avg_price) * 100
             )
             tops.append(new_top)
-
-        
 
         return PortfolioShapshotResponse(
             portfolio_id=portfolio.id,
