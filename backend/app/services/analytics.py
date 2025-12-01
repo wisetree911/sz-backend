@@ -98,7 +98,6 @@ class AnalyticsService:
                             weight_percent=(sector_to_current_value[sector]/total_value)*100)
             sector_positions.append(sector_pos)
         
-
         return SectorDistributionResponse(
             portfolio_id=portfolio_id,
             total_value=total_value,
