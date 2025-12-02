@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
 from typing import List
 
 class TopPosition(BaseModel):
@@ -15,7 +14,7 @@ class TopPosition(BaseModel):
     weight_percent: float=Field(..., description="weight of asset in portfolio in percents")
 
 
-class PortfolioShapshotResponse(BaseModel): # rename
+class PortfolioShapshotResponse(BaseModel):
     portfolio_id: int=Field(..., description="portfolio ID")
     name: str=Field(..., description="portfolio name")
     total_value: float=Field(..., description="total current value of portfolio")
@@ -25,6 +24,20 @@ class PortfolioShapshotResponse(BaseModel): # rename
     currency: str=Field(..., description="currency of portfolio, for example: RUB")
     positions_count: int=Field(..., description="number of unique assets in portfolio")
     top_positions: List[TopPosition]=Field(..., description="top 3 positions in portfolio by value part in portfolio")
+
+    @classmethod
+    def empty(cls, portfolio):
+        return cls(
+            portfolio_id = portfolio.id,
+            name = portfolio.name,
+            total_value = 0,
+            total_profit = 0,
+            total_profit_percent = 0,
+            invested_value = 0,
+            currency = portfolio.currency,
+            positions_count = 0,
+            top_positions = []
+        )
 
 
 class SectorPosition(BaseModel):
