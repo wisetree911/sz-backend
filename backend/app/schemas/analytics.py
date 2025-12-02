@@ -34,5 +34,7 @@ class SectorPositions(BaseModel):
 
 class SectorDistributionResponse(BaseModel):
     portfolio_id : int=Field(..., description="portfolio ID")
+    name: str=Field(..., description="portfolio name")
     total_value: float=Field(..., description="total current value of portfolio")
+    currency: str=Field(..., description="currency of portfolio, for example: RUB")
     sectors: List[SectorPositions]

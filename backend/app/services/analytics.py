@@ -74,7 +74,7 @@ class AnalyticsService:
     
 
 
-    
+    # вынести список секторов прилично, оптимизировать скорость
     async def sector_distribution(self, portfolio_id):
         sectors = ["energy", "finance", "retail", "transport", "metals", "it", "construction", "industrial", "telecom", "agro", "healthcare"]
         portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
@@ -96,11 +96,13 @@ class AnalyticsService:
             sector_pos = SectorPositions(sector=sector, 
                             current_value=sector_to_current_value[sector], 
                             weight_percent=(sector_to_current_value[sector]/total_value)*100)
-            sector_positions.append(sector_pos)
+            if sector_pos.current_value != 0: sector_positions.append(sector_pos)
         
         return SectorDistributionResponse(
             portfolio_id=portfolio_id,
+            name=portfolio.name,
             total_value=total_value,
+            currency=portfolio.currency,
             sectors=sector_positions
         )
 
