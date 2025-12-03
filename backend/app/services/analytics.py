@@ -1,11 +1,13 @@
-from datetime import datetime, timedelta
+from typing import List
+from datetime import date, datetime, timedelta
+from shared.models.asset_price import AssetPrice
 from shared.repositories.asset_price import AssetPriceRepository
 from shared.repositories.portfolio import PortfolioRepository
 from shared.repositories.asset import AssetRepository
 from shared.repositories.portfolio_position import PortfolioPositionRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
-from app.schemas.analytics import PortfolioShapshotResponse, TopPosition, SectorDistributionResponse, SectorPosition
+from app.schemas.analytics import PortfolioShapshotResponse, TopPosition, SectorDistributionResponse, SectorPosition, PortfolioPrice, PortfolioDynamicsResponse
 from app.analytics.portfolio_snapshot import (
     calc_portfolio_current_value,
     calc_invested_value,
@@ -16,6 +18,14 @@ from app.analytics.portfolio_snapshot import (
     calc_position_profit_percent,
     calc_position_weight_in_portfolio,
 )
+def get_portfolio_price_by_ts(ts: int, asset_prices: List[AssetPrice]):
+    total_price = 0
+    for asset_price in asset_prices:
+        timestamp = asset_price.timestamp.replace(second=0, microsecond=0)
+        if timestamp == ts:
+            total_price += asset_price.price
+    return total_price if total_price != 0 else 1
+        
 class AnalyticsService:
     def __init__(self, session: AsyncSession):
         self.session=session
@@ -70,13 +80,14 @@ class AnalyticsService:
         )
     
 
-
     async def sector_distribution(self, portfolio_id):
         portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
         if portfolio is None: raise HTTPException(404, "SZ portfolio not found")
         positions = await self.portfolio_position_repo.get_by_portfolio_id(portfolio_id)
         if not positions: return SectorDistributionResponse(portfolio_id=portfolio_id,
+                                                            name=portfolio.name,
                                                             total_value=0,
+                                                            currency=portfolio.currency,
                                                             sectors=[])
         asset_ids=[pos.asset_id for pos in positions]
         prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
@@ -89,7 +100,7 @@ class AnalyticsService:
             sector_to_value[sec]  = sector_to_value.get(sec, 0) + value
         sector_positions = []
         for sector in sector_to_value.keys():
-            sector_positions.append( SectorPosition(sector=sector, 
+            sector_positions.append(SectorPosition(sector=sector, 
                             current_value=sector_to_value[sector], 
                             weight_percent=(sector_to_value[sector]/total_value)*100))
         sector_positions.sort(key=lambda x: x.current_value, reverse=True)
@@ -106,36 +117,28 @@ class AnalyticsService:
         pass
     
 
-    async def portfolios_dynamics(self, user_id: int):
-        portfolios = await self.portfolio_repo.get_by_user_id(user_id=user_id)
-        since = datetime.utcnow() - timedelta(hours=24)
-        response = []
-        for portfolio in portfolios:
-            positions = await self.portfolio_position_repo.get_by_portfolio_id(portfolio_id=portfolio.id)
-            if not positions:
-                response.append({"id": portfolio.id, "name": portfolio.name, "data": []})
-                continue
+    async def portfolio_dynamics_for_24h(self, portfolio_id: int):
+        portfolio = await self.portfolio_repo.get_by_id(portfolio_id=portfolio_id)
+        positions = await self.portfolio_position_repo.get_by_portfolio_id(portfolio_id=portfolio_id)
+        asset_ids = [pos.asset_id for pos in positions]
+        asset_prices = await self.asset_price_repo.get_prices_since(ids=asset_ids, since=datetime.utcnow() - timedelta(days=1) )
+        # берем 96 точек от сейчас до сейчас-24 часа, интервал 15 минут, если цены нет у какого то актива в конкретной точке то зануляем всю точку (затычка)
+        start = datetime.utcnow() - timedelta(days=1)
+        count = int ((datetime.utcnow() - start).total_seconds() / 60 / 15)
+        time_series = []
+        for i in range(count):
+            ts = (datetime.utcnow() - timedelta(minutes=15*i)).replace(second=0, microsecond=0)
+            time_series.append(ts)
+        time_series = sorted(time_series, reverse=False)
 
-            asset_ids = [p.asset_id for p in positions]
-            pos_dict = {p.asset_id: p.quantity for p in positions}
+        data = []
+        for ts in time_series:
+            data.append(PortfolioPrice(timestamp=ts, total_value=get_portfolio_price_by_ts(ts, asset_prices)))
+        
+        return PortfolioDynamicsResponse(
+            portfolio_id=portfolio.id,
+            name=portfolio.name,
+            data=data
+        )
 
-            prices = await self.asset_price_repo.get_prices_since(ids=asset_ids, since=since)
-
-            time_map = {}
-            for price in prices:
-                ts = price.timestamp
-                asset_id = price.asset_id
-                if ts not in time_map: time_map[ts] = 0
-                time_map[ts] += price.price * pos_dict[asset_id]
-            
-            data = [{"timestamp": ts.isoformat(), "value": float(val)}
-                    for ts, val in sorted(time_map.items(), key=lambda x: x[0])
-            ]
-            
-            response.append({
-                "id" : portfolio.id,
-                "name" : portfolio.name,
-                "data" : data
-            })
-            
-        return response
+        

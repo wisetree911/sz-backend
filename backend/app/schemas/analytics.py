@@ -1,3 +1,4 @@
+import datetime
 from pydantic import BaseModel, Field
 from typing import List
 
@@ -51,3 +52,14 @@ class SectorDistributionResponse(BaseModel):
     total_value: float=Field(..., description="total current value of portfolio")
     currency: str=Field(..., description="currency of portfolio, for example: RUB")
     sectors: List[SectorPosition]
+
+
+class PortfolioPrice(BaseModel):
+    timestamp: datetime.datetime
+    total_value: float
+
+
+class PortfolioDynamicsResponse(BaseModel):
+    portfolio_id : int=Field(..., description="portfolio ID")
+    name: str=Field(..., description="portfolio name")
+    data: List[PortfolioPrice]
