@@ -17,7 +17,6 @@ class Trade(Base):
     trade_time: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow
     )
-    fee: Mapped[float] = mapped_column(Numeric, nullable=True )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow
     )
