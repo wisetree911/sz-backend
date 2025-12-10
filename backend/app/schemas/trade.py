@@ -6,7 +6,8 @@ class TradeBase(BaseModel):
     asset_id: int
     direction: str
     quantity: int
-    price: int
+    price: float
+    trade_time: datetime
 
 class TradeCreate(TradeBase):
     pass
@@ -17,6 +18,7 @@ class TradeUpdate(TradeBase):
     direction: str | None = None
     quantity: int | None = None
     price: int | None = None
+    trade_time: int | None = None
 
 class TradeResponse(TradeBase):
     id: int
