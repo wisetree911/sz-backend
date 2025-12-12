@@ -20,9 +20,8 @@ class AnalyticsService:
         self.portfolio_repo=PortfolioRepository(session=session)
         self.asset_repo=AssetRepository(session=session)
         self.trade_repo=TradeRepository(session=session)
-
+# non-func
     async def get_portfolio_total_price(self, portfolio_id: int):
-
         trades = await self.trade_repo.get_trades_by_portfolio_id(portfolio_id=portfolio_id)
         total_value = 0
         for trade in trades:
@@ -34,42 +33,44 @@ class AnalyticsService:
 
     async def portfolio_snapshot(self, portfolio_id: int):
         portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
-        trades = await self.trade_repo.get_trades_by_portfolio_id(portfolio_id)
-        asset_ids = {trade.asset_id for trade in trades}
-        current_prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
+        portfolio_trades = await self.trade_repo.get_trades_by_portfolio_id(portfolio_id)
+        asset_ids = {trade.asset_id for trade in portfolio_trades}
+        asset_market_prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
+        trade_dtos = [TradeDTO.from_orm(trade) for trade in portfolio_trades]
+        portfolio_positions: List[AssetPosition] = build_only_buy_positions(trades=trade_dtos, current_prices=asset_market_prices)
+        cost_basis = calc_cost_basis(asset_positive_positons=portfolio_positions)
+        unrealized_pnl = calc_unrealized_pnl(asset_positive_positons=portfolio_positions)
+        market_price = calc_market_value(asset_positive_positons=portfolio_positions)
 
-        trade_dtos = [TradeDTO.from_orm(trade) for trade in trades]
-        positions = build_only_buy_positions(trades=trade_dtos)
-        cost_basis = calc_cost_basis(asset_positive_positons=positions)
-        unrealized_pnl = calc_unrealized_pnl(asset_positive_positons=positions, asset_prices=current_prices)
+        assets = await self.asset_repo.get_assets_dict_by_ids(asset_ids) # shit
 
         top_positions = []
 
-        for asset_id in asset_ids:
+        for pos in portfolio_positions:
             top_positions.append(
                 TopPosition(
-                    asset_id=0,
-                    ticker="none", # достать из ассет репо по asset_ids все данные и оттуда тикеры
-                    full_name="none",  # достать из ассет репо по asset_ids все данные и оттуда имена
-                    quantity=0, # все закрыто внутри модуля аналитики
-                    avg_buy_price=0, # все закрыто внутри модуля аналитики
-                    current_price=0, # достать из current_prices
-                    current_value=0, # все закрыто внутри модуля аналитики + достать из current_prices
-                    profit=0, # все закрыто внутри модуля аналитики + достать из current_prices
-                    profit_percent=0, # все закрыто внутри модуля аналитики + достать из current_prices
-                    weight_percent=0 # все закрыто внутри модуля аналитики + достать из current_prices
+                    asset_id=pos.asset_id,
+                    ticker=assets[pos.asset_id].ticker,
+                    full_name=assets[pos.asset_id].full_name,
+                    quantity=pos.quantity,
+                    avg_buy_price=pos.mid_price,
+                    asset_market_price=pos.asset_market_price,
+                    market_value=pos.market_price,
+                    unrealized_pnl=pos.unrealized_pnl,
+                    unrealized_return_pct=pos.unrealized_return_pct,
+                    weight_pct=pos.market_price / market_price * 100
                 )
             )
 
         return PortfolioShapshotResponse(
             portfolio_id=portfolio.id,
             name=portfolio.name,
-            market_value=calc_market_value(asset_positive_positons=positions, asset_prices=current_prices),
+            market_value=market_price,
             unrealized_pnl=unrealized_pnl,
             unrealized_return_pct=calc_unrealized_return_pct(unrealized_pnl=unrealized_pnl, cost_basis=cost_basis),
-            cost_basis=cost_basis ,
+            cost_basis=cost_basis,
             currency=portfolio.currency,
-            positions_count=len(positions),
+            positions_count=len(portfolio_positions),
             top_positions=top_positions
         )
 
