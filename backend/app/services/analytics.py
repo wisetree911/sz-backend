@@ -7,7 +7,6 @@ from shared.repositories.asset import AssetRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 from app.schemas.analytics import PortfolioShapshotResponse, TopPosition, SectorDistributionResponse, SectorPosition, PortfolioPrice, PortfolioDynamicsResponse
-# from app.analytics.portfolio_snapshot import get_asset_id_to_quantity_dict, calc_market_value
 from shared.repositories.trade import TradeRepository
 from app.analytics.models import AssetPosition, Lot, TradeDTO
 from app.analytics.analytics_calc import calc_unrealized_pnl, build_only_buy_positions, calc_cost_basis, calc_market_value, calc_unrealized_return_pct
@@ -43,12 +42,8 @@ class AnalyticsService:
         market_price = calc_market_value(asset_positive_positons=portfolio_positions)
 
         assets = await self.asset_repo.get_assets_dict_by_ids(asset_ids) # shit
-
-        top_positions = []
-
-        for pos in portfolio_positions:
-            top_positions.append(
-                TopPosition(
+        top_positions = [
+            TopPosition(
                     asset_id=pos.asset_id,
                     ticker=assets[pos.asset_id].ticker,
                     full_name=assets[pos.asset_id].full_name,
@@ -59,9 +54,8 @@ class AnalyticsService:
                     unrealized_pnl=pos.unrealized_pnl,
                     unrealized_return_pct=pos.unrealized_return_pct,
                     weight_pct=pos.market_price / market_price * 100
-                )
-            )
-
+                ) for pos in portfolio_positions
+        ]
         return PortfolioShapshotResponse(
             portfolio_id=portfolio.id,
             name=portfolio.name,
@@ -74,35 +68,35 @@ class AnalyticsService:
             top_positions=top_positions
         )
 
-#     async def sector_distribution(self, portfolio_id: int) -> SectorDistributionResponse:
-#         portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
-#         if portfolio is None:
-#             raise HTTPException(404, "SZ portfolio not found")
-#         positions = await self.portfolio_position_repo.get_by_portfolio_id(portfolio_id)
-#         if not positions:
-#             return SectorDistributionResponse.empty(portfolio)
-#         asset_ids=[pos.asset_id for pos in positions]
-#         prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
-#         total_value = sum(pos.quantity * prices[pos.asset_id] for pos in positions)
-#         assets = await self.asset_repo.get_assets_dict_by_ids(asset_ids)
-#         sector_to_value={}
-#         for pos in positions:
-#             sec=assets[pos.asset_id].sector
-#             value=prices[pos.asset_id] * pos.quantity
-#             sector_to_value[sec]  = sector_to_value.get(sec, 0) + value
-#         sector_positions = []
-#         for sector in sector_to_value.keys():
-#             sector_positions.append(SectorPosition(sector=sector, 
-#                             current_value=sector_to_value[sector], 
-#                             weight_percent=(sector_to_value[sector]/total_value)*100))
-#         sector_positions.sort(key=lambda x: x.current_value, reverse=True)
-#         return SectorDistributionResponse(
-#             portfolio_id=portfolio.id,
-#             name=portfolio.name,
-#             total_value=total_value,
-#             currency=portfolio.currency,
-#             sectors=sector_positions
-#         )
+    async def sector_distribution(self, portfolio_id: int) -> SectorDistributionResponse:
+        portfolio = await self.portfolio_repo.get_by_id(portfolio_id)
+        if portfolio is None:
+            raise HTTPException(404, "SZ portfolio not found")
+        positions = await self.portfolio_position_repo.get_by_portfolio_id(portfolio_id)
+        if not positions:
+            return SectorDistributionResponse.empty(portfolio)
+        asset_ids=[pos.asset_id for pos in positions]
+        prices = await self.asset_price_repo.get_prices_dict_by_ids(asset_ids)
+        total_value = sum(pos.quantity * prices[pos.asset_id] for pos in positions)
+        assets = await self.asset_repo.get_assets_dict_by_ids(asset_ids)
+        sector_to_value={}
+        for pos in positions:
+            sec=assets[pos.asset_id].sector
+            value=prices[pos.asset_id] * pos.quantity
+            sector_to_value[sec]  = sector_to_value.get(sec, 0) + value
+        sector_positions = []
+        for sector in sector_to_value.keys():
+            sector_positions.append(SectorPosition(sector=sector, 
+                            current_value=sector_to_value[sector], 
+                            weight_percent=(sector_to_value[sector]/total_value)*100))
+        sector_positions.sort(key=lambda x: x.current_value, reverse=True)
+        return SectorDistributionResponse(
+            portfolio_id=portfolio.id,
+            name=portfolio.name,
+            total_value=total_value,
+            currency=portfolio.currency,
+            sectors=sector_positions
+        )
 
 
 #     async def positions_breakdown(self, portfolio_id):
