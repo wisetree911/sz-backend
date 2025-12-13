@@ -46,3 +46,9 @@ class AssetRepository:
         result = await self.session.execute(query)
         rows = result.scalars().all()
         return {asset.id: asset for asset in rows}
+    
+    async def get_assets_by_ids(self, ids: List[int]) -> Dict[int, Asset]:
+        query = select(Asset).where(Asset.id.in_(ids))
+        result = await self.session.execute(query)
+        rows = result.scalars().all()
+        return rows
