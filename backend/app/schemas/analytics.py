@@ -44,24 +44,24 @@ class PortfolioShapshotResponse(BaseModel):
 
 class SectorPosition(BaseModel):
     sector: str=Field(..., description="sector name, for example \"retail\"")
-    current_value: float=Field(..., description="current value of portfolio assets from stated sector")
+    market_value: float=Field(..., description="current value of portfolio assets from stated sector")
     weight_percent: float=Field(..., description="current percent value of portfolio assets from stated sector to whole current portfolio value")
 
 class SectorDistributionResponse(BaseModel):
     portfolio_id : int=Field(..., description="portfolio ID")
     name: str=Field(..., description="portfolio name")
-    total_value: float=Field(..., description="total current value of portfolio")
+    market_value: float=Field(..., description="total market value of portfolio")
     currency: str=Field(..., description="currency of portfolio, for example: RUB")
     sectors: List[SectorPosition]
 
     @classmethod
     def empty(cls, portfolio):
         return cls(
-            portfolio_id = portfolio.id,
-            name = portfolio.name,
-            total_value = 0,
-            currency = portfolio.currency,
-            sectors = []
+            portfolio_id=portfolio.id,
+            name=portfolio.name,
+            market_value=0,
+            currency=portfolio.currency,
+            sectors=[]
         )
 
 

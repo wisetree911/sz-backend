@@ -73,14 +73,14 @@ class AnalyticsService:
         secs: List[SectorPosition] = [
             SectorPosition(
                 sector=pos.sector, 
-                current_value=pos.market_value, 
+                market_value=pos.market_value, 
                 weight_percent=pos.market_value / portfolio_market_value * 100
             ) for pos in sector_positions]
 
         return SectorDistributionResponse(
             portfolio_id=portfolio.id,
             name=portfolio.name,
-            total_value=portfolio_market_value,
+            market_value=portfolio_market_value,
             currency=portfolio.currency,
             sectors=secs
         ) 
