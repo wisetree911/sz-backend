@@ -2,7 +2,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Deque, Literal
-
+from datetime import datetime
 @dataclass(frozen=True)
 class TradeDTO:
     asset_id: int
@@ -71,6 +71,16 @@ class PortfolioPositionPrepared:
         return self.quantity * self.asset_market_price
 
 @dataclass
-class SectorPositionAn:
+class SectorPosition:
     sector: str
     market_value: float
+
+@dataclass
+class DynamicsPosition:
+    asset_id: int
+    quantity: int
+
+@dataclass
+class TimeSerie:
+    timestamp: datetime
+    price: float
