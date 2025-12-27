@@ -1,15 +1,26 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+
+class PortfolioCreate(BaseModel):
+    name: str
+    currency: str
+
+class PortfolioUpdate(BaseModel):
+    name: str | None = None
+    currency: str | None = None
+
 class PortfolioBase(BaseModel):
     user_id: int
     name: str
     currency: str
 
-class PortfolioCreate(PortfolioBase):
+class PortfolioCreateAdm(PortfolioBase):
     pass
 
-class PortfolioUpdate(PortfolioBase):
+
+
+class PortfolioUpdateAdm(PortfolioBase):
     user_id: int | None = None
     name: str | None = None
     currency: str | None = None
