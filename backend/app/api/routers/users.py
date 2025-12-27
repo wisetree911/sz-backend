@@ -13,15 +13,16 @@ async def get_user(user_id: int, service: UserService=Depends(get_user_service))
 async def get_users(service: UserService=Depends(get_user_service)) -> list[UserResponse]:
     return await service.get_all()
 
-@router.post("/", summary="Create user")
+@router.post("/", status_code=status.HTTP_201_CREATED, summary="Create user")
 async def create_user(payload: UserCreate, service: UserService=Depends(get_user_service)) -> UserResponse:
     return await service.create(obj_in=payload)
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete user by user_id")
 async def delete_user(user_id: int, service: UserService=Depends(get_user_service)):
     await service.delete_user(user_id=user_id)
-    return
-@router.patch("/{user_id}")
-async def update(user_id: int, payload: UserUpdate, service: UserService=Depends(get_user_service)):
+    return None
+
+@router.patch("/{user_id}", summary="Update user bu user_id")
+async def update(user_id: int, payload: UserUpdate, service: UserService=Depends(get_user_service)) -> UserResponse:
     return await service.update(user_id=user_id, payload=payload)
     
