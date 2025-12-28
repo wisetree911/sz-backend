@@ -29,4 +29,3 @@ async def delete_asset(asset_id: int, service: AssetService=Depends(get_asset_se
 @router.patch("/{asset_id}")
 async def update_asset(asset_id: int, payload: AssetUpdate, service: AssetService=Depends(get_asset_service)) -> AssetResponse:
     return await service.update(asset_id=asset_id, payload=payload)
-## TODO : add sector column to other cruds

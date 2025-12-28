@@ -5,6 +5,7 @@ class AssetBase(BaseModel):
     ticker: str
     full_name: str
     type: str
+    sector: str
 
 class AssetCreate(AssetBase):
     pass
