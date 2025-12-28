@@ -1,13 +1,13 @@
 from sqlalchemy import select
 from shared.models.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreateAdm, UserUpdateAdm
 
 class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, obj_in: UserCreate):
+    async def create(self, obj_in: UserCreateAdm):
         obj=User(**obj_in.dict())
         self.session.add(obj)
         await self.session.commit()
@@ -29,7 +29,7 @@ class UserRepository:
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
         
-    async def update(self, user: User, obj_in: UserUpdate):
+    async def update(self, user: User, obj_in: UserUpdateAdm):
         update_data=obj_in.dict(exclude_unset=True)
         for field, value in update_data.items():
             setattr(user, field, value)
