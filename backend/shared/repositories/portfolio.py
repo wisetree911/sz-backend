@@ -1,7 +1,7 @@
 from sqlalchemy import select, func
 from shared.models.portfolio import Portfolio
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.portfolio import PortfolioCreateAdm, PortfolioUpdateAdm, PortfolioCreate, PortfolioUpdate
+from app.schemas.portfolio import PortfolioCreateAdm, PortfolioUpdateAdm, PortfolioCreatePublic, PortfolioUpdatePublic
 
 class PortfolioRepository:
     def __init__(self, session: AsyncSession):
@@ -42,7 +42,7 @@ class PortfolioRepository:
         portfolios = result.scalars().all()
         return portfolios
 
-    async def create_for_user(self, payload: PortfolioCreate, user_id: int):
+    async def create_for_user(self, payload: PortfolioCreatePublic, user_id: int):
         obj = Portfolio(
             user_id=user_id,
             name=payload.name,
