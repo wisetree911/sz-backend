@@ -1,13 +1,13 @@
 from sqlalchemy import select
 from shared.models.asset import Asset
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.asset import AssetCreate, AssetUpdate
+from app.schemas.asset import AssetCreateAdm, AssetUpdateAdm
 from typing import List, Dict
 class AssetRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, obj_in: AssetCreate):
+    async def create(self, obj_in: AssetCreateAdm):
         obj=Asset(**obj_in.dict())
         self.session.add(obj)
         await self.session.commit()
@@ -24,7 +24,7 @@ class AssetRepository:
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
     
-    async def update(self, asset: Asset, obj_in: AssetUpdate):
+    async def update(self, asset: Asset, obj_in: AssetUpdateAdm):
         update_data=obj_in.dict(exclude_unset=True)
         for field, value in update_data.items():
             setattr(asset, field, value)

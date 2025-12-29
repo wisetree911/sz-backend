@@ -1,25 +1,24 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
 
-class AssetBase(BaseModel):
+class AssetFields(BaseModel):
     ticker: str
     full_name: str
     type: str
     sector: str
 
-class AssetCreate(AssetBase):
+class AssetResponsePublic(AssetFields):
+    id: int
+
+class AssetResponseAdm(AssetFields):
+    id: int
+    created_at: datetime
+
+class AssetCreateAdm(AssetFields):
     pass
 
-class AssetUpdate(AssetBase):
+class AssetUpdateAdm(AssetFields):
     ticker: str | None = None
     full_name: str | None = None
     type: str | None = None
     sector: str | None = None
-
-class AssetResponse(AssetBase):
-    id: int
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-        
