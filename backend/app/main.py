@@ -1,7 +1,6 @@
 from fastapi import FastAPI, APIRouter
-from app.api.routers import routers as public_routers
+from app.api.routers.public import routers as public_routers
 from app.api.routers.adm import routers as admin_routers
-
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -24,7 +23,7 @@ app.add_middleware(
 for r in public_routers:
     api_router.include_router(r)
 
-for r in admin_routers:
-    api_router.include_router(r)
+# for r in admin_routers:
+#     api_router.include_router(r)
     
 app.include_router(api_router)
