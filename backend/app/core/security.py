@@ -36,7 +36,9 @@ def create_refresh_token(user_id: int, jti: str) -> str:
 def hash_of_refresh_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
-
+def get_jti_from_token(token: str):
+    decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    return decoded.get("jti")
 
 class InvalidRefreshToken(Exception):
     pass
