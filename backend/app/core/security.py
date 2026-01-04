@@ -2,7 +2,8 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt
 from passlib.context import CryptContext
 from app.core.config import settings
-
+import hashlib
+from jose import JWTError
 pwd_context = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
 
 def hash_password(password: str) -> str:
@@ -31,3 +32,32 @@ def create_refresh_token(user_id: int, jti: str) -> str:
         "iat": datetime.now(timezone.utc)
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+def hash_of_refresh_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+
+class InvalidRefreshToken(Exception):
+    pass
+
+def decode_refresh_token(token: str) -> tuple[int, str]:
+    try:
+        decoded = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+        )
+    except JWTError:
+        raise InvalidRefreshToken()
+
+    if decoded.get("type") != "refresh":
+        raise InvalidRefreshToken()
+
+    user_id = decoded.get("sub")
+    jti = decoded.get("jti")
+
+    if not user_id or not jti:
+        raise InvalidRefreshToken()
+
+    return int(user_id), jti
