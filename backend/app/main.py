@@ -8,30 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers.public import routers as public_routers
 from app.api.routers.adm import routers as admin_routers
 from app.core.config import settings
+from app.ws.ws import ws_manager
 
-
-class WSManager:
-    def __init__(self):
-        self._clients: Set[WebSocket] = set()
-
-    async def connect(self, ws: WebSocket):
-        await ws.accept()
-        self._clients.add(ws)
-
-    def disconnect(self, ws: WebSocket):
-        self._clients.discard(ws)
-
-    async def broadcast(self, message: str):
-        dead: list[WebSocket] = []
-        for ws in self._clients:
-            try:
-                await ws.send_text(message)
-            except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self.disconnect(ws)
-
-ws_manager = WSManager()
 app = FastAPI()
 
 @app.websocket("/ws/prices")
