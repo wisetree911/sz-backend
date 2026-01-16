@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from datetime import datetime
+from pydantic.types import AwareDatetime
+
 class Token(BaseModel):
     access_token: str
     refresh_token: str
@@ -20,4 +21,4 @@ class RefreshSessionCreate(BaseModel):
     user_id: int
     jti: str
     token_hash: str
-    expires_at: datetime
+    expires_at: AwareDatetime

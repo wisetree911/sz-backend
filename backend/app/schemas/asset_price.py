@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
+from pydantic.types import AwareDatetime
 
 class AssetPriceBase(BaseModel):
     asset_id: int
@@ -18,8 +18,7 @@ class AssetPriceUpdate(AssetPriceBase):
 
 class AssetPriceResponse(AssetPriceBase):
     id: int
-    timestamp: datetime
+    timestamp: AwareDatetime
 
     class Config:
         from_attributes = True
-        

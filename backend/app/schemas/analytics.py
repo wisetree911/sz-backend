@@ -1,12 +1,12 @@
-from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict
-from pydantic.types import PositiveInt, NonNegativeInt
+from pydantic.types import PositiveInt, NonNegativeInt, AwareDatetime
 from typing import Annotated
 from enum import Enum
 
 class APIModel(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
+        str_strip_whitespace=True
     )
 
 class Currency(str, Enum):
@@ -86,7 +86,7 @@ class SectorDistributionResponse(APIModel):
 
 
 class PortfolioPrice(APIModel):
-    timestamp: datetime = Field(..., description="Timestamp in iso8601")
+    timestamp: AwareDatetime = Field(..., description="Timestamp in iso8601")
     total_value: Money = Field(..., description="Total value of portfolio at selected timestamp")
 
 class PortfolioDynamicsResponse(APIModel):

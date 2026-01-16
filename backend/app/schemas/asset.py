@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
+from pydantic.types import AwareDatetime
 
 class AssetFields(BaseModel):
     ticker: str
@@ -12,7 +12,7 @@ class AssetResponsePublic(AssetFields):
 
 class AssetResponseAdm(AssetFields):
     id: int
-    created_at: datetime
+    created_at: AwareDatetime
 
 class AssetCreateAdm(AssetFields):
     pass

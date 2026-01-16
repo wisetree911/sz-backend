@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
+from pydantic.types import AwareDatetime
 
 class UserFields(BaseModel):
     name: str
@@ -27,7 +27,4 @@ class UserResponsePublic(UserFields):
 class UserResponseAdm(UserFields):
     id: int
     hashed_password: str
-    created_at: datetime
-    
-
-
+    created_at: AwareDatetime

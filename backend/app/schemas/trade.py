@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
+from pydantic.types import AwareDatetime
 
 class TradeBase(BaseModel):
     portfolio_id: int
@@ -7,7 +7,7 @@ class TradeBase(BaseModel):
     direction: str
     quantity: int
     price: float
-    trade_time: datetime
+    trade_time: AwareDatetime
 
 class TradeCreate(TradeBase):
     pass
@@ -22,8 +22,7 @@ class TradeUpdate(TradeBase):
 
 class TradeResponse(TradeBase):
     id: int
-    created_at: datetime
+    created_at: AwareDatetime
 
     class Config:
         from_attributes = True 
-    
