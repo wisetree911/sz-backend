@@ -1,6 +1,5 @@
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Deque
 from datetime import datetime
 
 
@@ -34,7 +33,7 @@ class PortfolioPositionPrepared:
     ticker: str
     name: str
     sector: str
-    lots: Deque[Lot] = field(default_factory=deque)
+    lots: deque[Lot] = field(default_factory=deque)
 
     @property
     def mid_price(self):

@@ -1,12 +1,11 @@
-from fastapi import Depends
-from fastapi import APIRouter
 from app.api.deps import get_analytics_service
-from app.services.analytics import AnalyticsService
 from app.schemas.analytics import (
+    PortfolioDynamicsResponse,
     PortfolioSnapshotResponse,
     SectorDistributionResponse,
-    PortfolioDynamicsResponse,
 )
+from app.services.analytics import AnalyticsService
+from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 

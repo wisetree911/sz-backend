@@ -1,8 +1,9 @@
-from sqlalchemy import select
-from shared.models.trade import Trade
-from shared.models.portfolio import Portfolio
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.trade import TradeCreate, TradeUpdate
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from shared.models.portfolio import Portfolio
+from shared.models.trade import Trade
 
 
 class TradeRepository:

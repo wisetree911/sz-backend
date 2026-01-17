@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field, ConfigDict, model_validator
-from pydantic.types import AwareDatetime, PositiveInt
 from enum import Enum
 from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic.types import AwareDatetime, PositiveInt
 
 
 class APIModel(BaseModel):

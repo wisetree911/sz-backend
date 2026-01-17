@@ -1,7 +1,8 @@
-from sqlalchemy import select
-from shared.models.asset import Asset
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.asset import AssetCreateAdm, AssetUpdateAdm
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from shared.models.asset import Asset
 
 
 class AssetRepository:

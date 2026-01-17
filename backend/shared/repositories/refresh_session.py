@@ -1,8 +1,10 @@
-from sqlalchemy import select, update
-from shared.models.refresh_sessions import RefreshSession
-from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import UTC, datetime
+
 from app.schemas.auth import RefreshSessionCreate
-from datetime import datetime, timezone
+from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from shared.models.refresh_sessions import RefreshSession
 
 
 class RefreshSessionRepository:
@@ -24,6 +26,6 @@ class RefreshSessionRepository:
         await self.session.execute(
             update(RefreshSession)
             .where(RefreshSession.jti == jti)
-            .values(revoked_at=datetime.now(timezone.utc))
+            .values(revoked_at=datetime.now(UTC))
         )
         await self.session.commit()

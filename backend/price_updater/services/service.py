@@ -1,8 +1,8 @@
+from app.core.database import async_session_maker
+from app.schemas.asset_price import AssetPriceCreate
 from loguru import logger
 from price_updater.clients.moex_client import MoexClient
 from shared.repositories.asset_price import AssetPriceRepository
-from app.schemas.asset_price import AssetPriceCreate
-from app.core.database import async_session_maker
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

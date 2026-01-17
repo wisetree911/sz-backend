@@ -1,12 +1,11 @@
-from fastapi import APIRouter, status, Depends
+from app.api.deps import get_current_user, get_portfolio_service
 from app.schemas.portfolio import (
     PortfolioCreatePublic,
     PortfolioResponseAdm,
     PortfolioUpdatePublic,
 )
 from app.services.portfolios import PortfolioService
-from app.api.deps import get_portfolio_service
-from app.api.deps import get_current_user
+from fastapi import APIRouter, Depends, status
 
 router = APIRouter(prefix="/portfolios", tags=["Portfolios"])
 

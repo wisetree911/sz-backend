@@ -1,7 +1,8 @@
-from sqlalchemy import Text, ForeignKey, DateTime, Numeric, func
-from app.core.database import Base
-from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
+
+from app.core.database import Base
+from sqlalchemy import DateTime, ForeignKey, Numeric, Text, func
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Trade(Base):

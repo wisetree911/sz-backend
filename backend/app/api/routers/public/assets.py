@@ -1,8 +1,7 @@
-from fastapi import Depends
-from fastapi import APIRouter
-from app.services.assets import AssetService
-from app.schemas.asset import AssetResponsePublic
 from app.api.deps import get_asset_service
+from app.schemas.asset import AssetResponsePublic
+from app.services.assets import AssetService
+from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/assets", tags=["Assets"])
 

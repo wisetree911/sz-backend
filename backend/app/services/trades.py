@@ -1,6 +1,7 @@
+from fastapi import HTTPException
 from shared.repositories.trade import TradeRepository
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
+
 from app.schemas.trade import TradeCreate, TradeUpdate
 
 

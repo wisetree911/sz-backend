@@ -1,7 +1,8 @@
 from datetime import datetime
-from sqlalchemy import Text, DateTime, ForeignKey, func
-from sqlalchemy.orm import Mapped, mapped_column
+
 from app.core.database import Base
+from sqlalchemy import DateTime, ForeignKey, Text, func
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class RefreshSession(Base):

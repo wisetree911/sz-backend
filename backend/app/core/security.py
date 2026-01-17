@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta, timezone
-from jose import jwt
-from passlib.context import CryptContext
-from app.core.config import settings
 import hashlib
-from jose import JWTError
+from datetime import UTC, datetime, timedelta
+
+from app.core.config import settings
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
 
@@ -17,26 +17,26 @@ def verify_password(password: str, hashed: str) -> bool:
 
 
 def create_access_token(user_id: int) -> str:
-    expirates_at = datetime.now(timezone.utc) + timedelta(
+    expirates_at = datetime.now(UTC) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     payload = {
         "sub": str(user_id),
         "type": "access",
         "exp": expirates_at,
-        "iat": datetime.now(timezone.utc),
+        "iat": datetime.now(UTC),
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def create_refresh_token(user_id: int, jti: str) -> str:
-    expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    expires_at = datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     payload = {
         "sub": str(user_id),
         "jti": jti,
         "type": "refresh",
         "exp": expires_at,
-        "iat": datetime.now(timezone.utc),
+        "iat": datetime.now(UTC),
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 

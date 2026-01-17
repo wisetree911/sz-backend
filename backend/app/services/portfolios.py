@@ -1,5 +1,6 @@
-from shared.repositories.portfolio import PortfolioRepository
 from fastapi import HTTPException
+from shared.repositories.portfolio import PortfolioRepository
+
 from app.schemas.portfolio import PortfolioCreatePublic, PortfolioUpdatePublic
 
 

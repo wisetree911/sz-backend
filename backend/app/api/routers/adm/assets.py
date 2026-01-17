@@ -1,8 +1,7 @@
-from fastapi import Depends, status
-from fastapi import APIRouter
-from app.services.assets import AssetService
-from app.schemas.asset import AssetCreateAdm, AssetResponseAdm, AssetUpdateAdm
 from app.api.deps import get_asset_service
+from app.schemas.asset import AssetCreateAdm, AssetResponseAdm, AssetUpdateAdm
+from app.services.assets import AssetService
+from fastapi import APIRouter, Depends, status
 
 router = APIRouter(prefix="/assets", tags=["Assets"])
 

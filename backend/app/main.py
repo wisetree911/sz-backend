@@ -1,11 +1,12 @@
 import asyncio
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routers.public import routers as public_routers
-from app.ws.routes import ws_router
-from app.core.redis import create_redis, close_redis
+from app.core.redis import close_redis, create_redis
 from app.ws.redis_listener import redis_prices_listener
+from app.ws.routes import ws_router
 
 app = FastAPI()
 

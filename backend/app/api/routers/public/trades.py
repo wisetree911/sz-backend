@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends
+from app.api.deps import get_current_user, get_trade_service
 from app.schemas.trade import TradeResponse
 from app.services.trades import TradeService
-from app.api.deps import get_trade_service, get_current_user
+from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/trades", tags=["Trades"])
 

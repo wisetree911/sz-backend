@@ -1,11 +1,12 @@
-from sqlalchemy import select
-from shared.models.portfolio import Portfolio
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.portfolio import (
     PortfolioCreateAdm,
-    PortfolioUpdateAdm,
     PortfolioCreatePublic,
+    PortfolioUpdateAdm,
 )
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from shared.models.portfolio import Portfolio
 
 
 class PortfolioRepository:

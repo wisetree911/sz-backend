@@ -1,12 +1,13 @@
 from collections import deque
 from datetime import datetime, timedelta
+
 from app.analytics.models import (
-    PortfolioPositionPrepared,
-    Lot,
-    TradeDTO,
-    SectorPosition,
     DynamicsPosition,
+    Lot,
+    PortfolioPositionPrepared,
+    SectorPosition,
     TimeSerie,
+    TradeDTO,
 )
 
 
@@ -140,7 +141,7 @@ def build_time_series(timestamp_now, asset_prices, dynamic_positions):
     asset_id_to_quantity = {pos.asset_id: pos.quantity for pos in dynamic_positions}
     data = []
     for ts in time_series:
-        total_price = int()
+        total_price = 0
         for asset_price in asset_prices:
             timestamp = asset_price.timestamp.replace(second=0, microsecond=0)
             if timestamp == ts:

@@ -1,28 +1,30 @@
 from datetime import datetime, timedelta
+
+from fastapi import HTTPException
+from shared.repositories.asset import AssetRepository
 from shared.repositories.asset_price import AssetPriceRepository
 from shared.repositories.portfolio import PortfolioRepository
-from shared.repositories.asset import AssetRepository
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
-from app.schemas.analytics import (
-    PortfolioSnapshotResponse,
-    TopPosition,
-    SectorDistributionResponse,
-    SectorDistributionPosition,
-    PortfolioPrice,
-    PortfolioDynamicsResponse,
-)
 from shared.repositories.trade import TradeRepository
-from app.analytics.models import PortfolioPositionPrepared, TradeDTO, SectorPosition
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.analytics.analytics_calc import (
-    calc_unrealized_pnl,
+    build_dynamics_positions,
     build_only_buy_positions,
+    build_sector_positions,
+    build_time_series,
     calc_cost_basis,
     calc_market_value,
+    calc_unrealized_pnl,
     calc_unrealized_return_pct,
-    build_sector_positions,
-    build_dynamics_positions,
-    build_time_series,
+)
+from app.analytics.models import PortfolioPositionPrepared, SectorPosition, TradeDTO
+from app.schemas.analytics import (
+    PortfolioDynamicsResponse,
+    PortfolioPrice,
+    PortfolioSnapshotResponse,
+    SectorDistributionPosition,
+    SectorDistributionResponse,
+    TopPosition,
 )
 
 
