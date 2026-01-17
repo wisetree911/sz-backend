@@ -9,7 +9,6 @@ from app.core.database import Base
 from app.core.config import settings
 
 
-
 config = context.config
 
 if config.config_file_name is not None:
