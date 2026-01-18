@@ -4,11 +4,17 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routers.public import routers as public_routers
+from app.core.logging import configure_logging_dev
+from app.core.middleware import request_logging_middleware
 from app.core.redis import close_redis, create_redis
 from app.ws.redis_listener import redis_prices_listener
 from app.ws.routes import ws_router
 
+configure_logging_dev(log_level="INFO")
+
 app = FastAPI()
+
+app.middleware("http")(request_logging_middleware)
 
 
 @app.on_event("startup")
