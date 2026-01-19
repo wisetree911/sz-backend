@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.api.deps import get_auth_service
+from app.api.dependencies import get_auth_service
 from app.schemas.auth import LogoutIn, RefreshIn, RegisterIn, Token
 from app.services.auth import AuthService
 from fastapi import APIRouter, Depends, status

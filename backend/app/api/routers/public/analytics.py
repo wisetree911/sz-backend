@@ -1,4 +1,4 @@
-from app.api.deps import get_analytics_service, get_current_user
+from app.api.dependencies import get_analytics_service, get_current_user
 from app.schemas.analytics import (
     PortfolioDynamicsResponse,
     PortfolioSnapshotResponse,

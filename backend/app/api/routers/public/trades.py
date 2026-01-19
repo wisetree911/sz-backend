@@ -1,4 +1,4 @@
-from app.api.deps import get_current_user, get_trade_service
+from app.api.dependencies import get_current_user, get_trade_service
 from app.schemas.trade import TradeResponse
 from app.services.trades import TradeService
 from fastapi import APIRouter, Depends
