@@ -1,4 +1,4 @@
-from app.api.deps import get_asset_service
+from app.api.dependencies import get_asset_service
 from app.schemas.asset import AssetCreateAdm, AssetResponseAdm, AssetUpdateAdm
 from app.services.assets import AssetService
 from fastapi import APIRouter, Depends, status

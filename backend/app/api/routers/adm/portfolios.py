@@ -1,4 +1,4 @@
-from app.api.deps import get_portfolio_service
+from app.api.dependencies import get_portfolio_service
 from app.schemas.portfolio import (
     PortfolioCreateAdm,
     PortfolioResponseAdm,
