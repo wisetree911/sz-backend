@@ -29,8 +29,8 @@ async def main():
 
     await reload_assets()
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(job, 'interval', seconds=UPDATE_INTERVAL)
-    scheduler.add_job(reload_assets, 'interval', minutes=10)
+    scheduler.add_job(job, "interval", seconds=UPDATE_INTERVAL, max_instances=1, coalesce=True, misfire_grace_time=30,)
+    scheduler.add_job(reload_assets, 'interval', minutes=60)
     scheduler.start()
     await job()
 
