@@ -28,14 +28,28 @@ async def main():
     logger.info('Price Updater старт')
 
     await reload_assets()
-    scheduler = AsyncIOScheduler()
-    scheduler.add_job(job, "interval", seconds=UPDATE_INTERVAL, max_instances=1, coalesce=True, misfire_grace_time=30,)
-    scheduler.add_job(reload_assets, 'interval', minutes=60)
-    scheduler.start()
     await job()
 
-    while True:
-        await asyncio.sleep(3600)
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(
+        job,
+        'interval',
+        seconds=UPDATE_INTERVAL,
+        max_instances=1,
+        coalesce=True,
+        misfire_grace_time=30,
+    )
+    scheduler.add_job(
+        reload_assets,
+        'interval',
+        minutes=60,
+        max_instances=1,
+        coalesce=True,
+        misfire_grace_time=300,
+    )
+
+    scheduler.start()
+    await asyncio.Event().wait()
 
 
 if __name__ == '__main__':
