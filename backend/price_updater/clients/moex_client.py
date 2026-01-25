@@ -17,6 +17,11 @@ class MoexHTTPError(MoexError):
         self.body = body
         super().__init__(f'MOEX HTTP {status}')
 
+class MoexNetworkError(MoexError):
+    """Network / timeout errors"""
+    
+class MoexParseError(MoexError):
+    """Invalid JSON / unexpected schema"""
 
 class MoexClient:
     URL_ALL = (
@@ -39,7 +44,7 @@ class MoexClient:
             await self._session.close()
 
     async def get_all_prices(self) -> dict[str, float]:
-        if not self._session or self._session.closed:
+        if not self._session or self._session.closed: 
             raise MoexSessionNotOpened('You forgot to call MoexClient aopen()')
         try:
             async with self._session.get(self.URL_ALL) as resp:
@@ -47,12 +52,19 @@ class MoexClient:
                     body = await resp.text()
                     raise MoexHTTPError(status=resp.status, body=body)
                 data = await resp.json()
-
+        except MoexHTTPError: 
+            raise
+        except aiohttp.ClientError as e: 
+            raise MoexNetworkError(str(e)) from e
         except Exception as e:
             raise MoexError(str(e)) from e
+        try:
+            rows = data["marketdata"]["data"]
+        except Exception as e:
+            raise MoexParseError("Unexpected MOEX response schema") from e
 
         prices: dict[str, float] = {}
-        for secid, last in data['marketdata']['data']:
+        for secid, last in rows:
             if last is None:
                 continue
             prices[secid] = float(last)
