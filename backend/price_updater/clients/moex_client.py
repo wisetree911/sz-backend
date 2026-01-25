@@ -1,5 +1,21 @@
 import aiohttp
-from loguru import logger
+
+
+class MoexError(Exception):
+    """Base error for Moex client"""
+
+
+class MoexSessionNotOpened(MoexError):
+    """Moex client session was not opened (aopen was not called)"""
+
+
+class MoexHTTPError(MoexError):
+    """Non 2xx response code from Moex API"""
+
+    def __init__(self, status: int, body: str | None = None):
+        self.status = status
+        self.body = body
+        super().__init__(f'MOEX HTTP {status}')
 
 
 class MoexClient:
@@ -24,14 +40,16 @@ class MoexClient:
 
     async def get_all_prices(self) -> dict[str, float]:
         if not self._session or self._session.closed:
-            raise
+            raise MoexSessionNotOpened('You forgot to call MoexClient aopen()')
         try:
             async with self._session.get(self.URL_ALL) as resp:
-                resp.raise_for_status()
+                if resp.status >= 400:
+                    body = await resp.text()
+                    raise MoexHTTPError(status=resp.status, body=body)
                 data = await resp.json()
+
         except Exception as e:
-            logger.error(f'!!!!!! Ошибка сети: {e} !!!!!')
-            raise
+            raise MoexError(str(e)) from e
 
         prices: dict[str, float] = {}
         for secid, last in data['marketdata']['data']:
