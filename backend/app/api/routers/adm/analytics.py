@@ -10,8 +10,8 @@ from fastapi import APIRouter, Depends
 router = APIRouter(prefix='/analytics', tags=['Analytics'])
 
 
-@router.get('/{portfolio_id}/shapshot')
-async def get_portfolio_shapshot(
+@router.get('/{portfolio_id}/snapshot')
+async def get_portfolio_snapshot(
     portfolio_id: int, service: AnalyticsService = Depends(get_analytics_service)
 ) -> PortfolioSnapshotResponse:
     return await service.portfolio_snapshot(portfolio_id=portfolio_id)

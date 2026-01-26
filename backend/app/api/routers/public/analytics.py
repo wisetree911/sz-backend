@@ -13,7 +13,7 @@ router = APIRouter(prefix='/analytics', tags=['Analytics'])
 @router.get(
     '/{portfolio_id}/snapshot', response_model=PortfolioSnapshotResponse
 )  # допилить чтобы аналитика давала (или в ручке) список снэпшотов по всем портфолио
-async def get_portfolio_shapshot_for_user(
+async def get_portfolio_snapshot_for_user(
     portfolio_id: int,
     current_user=Depends(get_current_user),
     service: AnalyticsService = Depends(get_analytics_service),
