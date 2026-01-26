@@ -1,5 +1,6 @@
 import asyncio
 
+from app.api.routers.adm import routers as admin_routers
 from app.api.routers.public import routers as public_routers
 from app.core.logging import configure_logging_dev
 from app.core.middleware import request_logging_middleware
@@ -58,7 +59,7 @@ for r in public_routers:
     api_router.include_router(r)
 
 
-# for r in admin_routers:
-#     api_router.include_router(r)
+for r in admin_routers:
+    api_router.include_router(r, prefix='/admin')
 
 app.include_router(api_router)
