@@ -17,6 +17,13 @@ async def get_portfolio_shapshot(
     return await service.portfolio_snapshot(portfolio_id=portfolio_id)
 
 
+@router.get('/v2/{portfolio_id}/shapshot', summary='V2')
+async def get_portfolio_shapshot_v2(
+    portfolio_id: int, service: AnalyticsService = Depends(get_analytics_service)
+) -> PortfolioSnapshotResponse:
+    return await service.portfolio_snapshot_v2(portfolio_id=portfolio_id)
+
+
 @router.get('/{portfolio_id}/sectors')
 async def get_portfolio_sectors_distribution(
     portfolio_id: int, service: AnalyticsService = Depends(get_analytics_service)

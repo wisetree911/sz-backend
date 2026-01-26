@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from app.analytics.analytics_calc import (
     build_dynamics_positions,
@@ -20,10 +21,12 @@ from app.schemas.analytics import (
     TopPosition,
 )
 from fastapi import HTTPException
+from shared.models.portfolio import Portfolio
 from shared.repositories.asset import AssetRepository
 from shared.repositories.asset_price import AssetPriceRepository
 from shared.repositories.portfolio import PortfolioRepository
 from shared.repositories.trade import TradeRepository
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -266,4 +269,177 @@ class AnalyticsService:
         ]
         return PortfolioDynamicsResponse(
             portfolio_id=portfolio.id, name=portfolio.name, data=prices
+        )
+
+    async def portfolio_snapshot_v2(self, portfolio_id: int) -> PortfolioSnapshotResponse:
+        row = await self.session.execute(
+            select(Portfolio.id, Portfolio.name, Portfolio.currency).where(
+                Portfolio.id == portfolio_id
+            )
+        )
+        portfolio = row.one_or_none()
+        if portfolio is None:
+            raise HTTPException(404, 'SZ portfolio not found')
+
+        totals_sql = text("""
+            WITH pos AS (
+                SELECT
+                    t.asset_id,
+                    SUM(t.quantity) AS quantity,
+                    SUM(t.quantity * t.price) AS cost_basis
+                FROM trades t
+                WHERE t.portfolio_id = :portfolio_id
+                  AND t.direction = 'buy'
+                GROUP BY t.asset_id
+            ),
+            latest_price AS (
+                SELECT DISTINCT ON (ap.asset_id)
+                    ap.asset_id,
+                    ap.price AS asset_market_price,
+                    ap.timestamp AS as_of
+                FROM asset_prices ap
+                JOIN pos ON pos.asset_id = ap.asset_id
+                ORDER BY ap.asset_id, ap.timestamp DESC
+            ),
+            enriched AS (
+                SELECT
+                    pos.asset_id,
+                    a.ticker,
+                    a.full_name,
+                    pos.quantity,
+                    pos.cost_basis,
+                    (pos.cost_basis / NULLIF(pos.quantity, 0)) AS avg_buy_price,
+                    COALESCE(lp.asset_market_price, 0) AS asset_market_price,
+                    (pos.quantity * COALESCE(lp.asset_market_price, 0)) AS market_value,
+                    ((pos.quantity * COALESCE(lp.asset_market_price, 0)) - pos.cost_basis) AS unrealized_pnl,
+                    (
+                        ((pos.quantity * COALESCE(lp.asset_market_price, 0)) - pos.cost_basis)
+                        / NULLIF(pos.cost_basis, 0) * 100
+                    ) AS unrealized_return_pct
+                FROM pos
+                JOIN assets a ON a.id = pos.asset_id
+                LEFT JOIN latest_price lp ON lp.asset_id = pos.asset_id
+            )
+            SELECT
+                COALESCE(SUM(enriched.market_value), 0) AS market_value,
+                COALESCE(SUM(enriched.unrealized_pnl), 0) AS unrealized_pnl,
+                COALESCE(SUM(enriched.cost_basis), 0) AS cost_basis,
+                COUNT(*) AS positions_count
+            FROM enriched;
+        """)
+
+        totals_row = (
+            (await self.session.execute(totals_sql, {'portfolio_id': portfolio_id}))
+            .mappings()
+            .one()
+        )
+
+        if int(totals_row['positions_count']) == 0:
+            return PortfolioSnapshotResponse.empty(
+                Portfolio(id=portfolio.id, name=portfolio.name, currency=portfolio.currency)
+            )
+
+        top5_sql = text("""
+            WITH pos AS (
+                SELECT
+                    t.asset_id,
+                    SUM(t.quantity) AS quantity,
+                    SUM(t.quantity * t.price) AS cost_basis
+                FROM trades t
+                WHERE t.portfolio_id = :portfolio_id
+                  AND t.direction = 'buy'
+                GROUP BY t.asset_id
+            ),
+            latest_price AS (
+                SELECT DISTINCT ON (ap.asset_id)
+                    ap.asset_id,
+                    ap.price AS asset_market_price,
+                    ap.timestamp AS as_of
+                FROM asset_prices ap
+                JOIN pos ON pos.asset_id = ap.asset_id
+                ORDER BY ap.asset_id, ap.timestamp DESC
+            ),
+            enriched AS (
+                SELECT
+                    pos.asset_id,
+                    a.ticker,
+                    a.full_name,
+                    pos.quantity,
+                    pos.cost_basis,
+                    (pos.cost_basis / NULLIF(pos.quantity, 0)) AS avg_buy_price,
+                    COALESCE(lp.asset_market_price, 0) AS asset_market_price,
+                    (pos.quantity * COALESCE(lp.asset_market_price, 0)) AS market_value,
+                    ((pos.quantity * COALESCE(lp.asset_market_price, 0)) - pos.cost_basis) AS unrealized_pnl,
+                    (
+                        ((pos.quantity * COALESCE(lp.asset_market_price, 0)) - pos.cost_basis)
+                        / NULLIF(pos.cost_basis, 0) * 100
+                    ) AS unrealized_return_pct
+                FROM pos
+                JOIN assets a ON a.id = pos.asset_id
+                LEFT JOIN latest_price lp ON lp.asset_id = pos.asset_id
+            )
+            SELECT
+                e.asset_id,
+                e.ticker,
+                e.full_name,
+                e.quantity,
+                e.avg_buy_price,
+                e.asset_market_price,
+                e.market_value,
+                e.unrealized_pnl,
+                e.unrealized_return_pct,
+                (e.market_value / NULLIF(SUM(e.market_value) OVER (), 0) * 100) AS weight_pct
+            FROM enriched e
+            ORDER BY weight_pct DESC NULLS LAST
+            LIMIT 5;
+        """)
+
+        top_rows = (
+            (await self.session.execute(top5_sql, {'portfolio_id': portfolio_id})).mappings().all()
+        )
+
+        market_value = Decimal(totals_row['market_value'])
+        unrealized_pnl = Decimal(totals_row['unrealized_pnl'])
+        cost_basis = Decimal(totals_row['cost_basis'])
+
+        unreal_total_ret = (
+            (unrealized_pnl / cost_basis * Decimal(100)) if cost_basis else Decimal(0)
+        )
+
+        return PortfolioSnapshotResponse(
+            portfolio_id=portfolio.id,
+            name=portfolio.name,
+            market_value=market_value,
+            unrealized_pnl=unrealized_pnl,
+            unrealized_return_pct=unreal_total_ret,
+            cost_basis=cost_basis,
+            currency=portfolio.currency,
+            positions_count=int(totals_row['positions_count']),
+            top_positions=[
+                TopPosition(
+                    asset_id=r['asset_id'],
+                    ticker=r['ticker'],
+                    full_name=r['full_name'],
+                    quantity=Decimal(r['quantity']) if r['quantity'] is not None else Decimal(0),
+                    avg_buy_price=Decimal(r['avg_buy_price'])
+                    if r['avg_buy_price'] is not None
+                    else Decimal(0),
+                    asset_market_price=Decimal(r['asset_market_price'])
+                    if r['asset_market_price'] is not None
+                    else Decimal(0),
+                    market_value=Decimal(r['market_value'])
+                    if r['market_value'] is not None
+                    else Decimal(0),
+                    unrealized_pnl=Decimal(r['unrealized_pnl'])
+                    if r['unrealized_pnl'] is not None
+                    else Decimal(0),
+                    unrealized_return_pct=Decimal(r['unrealized_return_pct'])
+                    if r['unrealized_return_pct'] is not None
+                    else Decimal(0),
+                    weight_pct=Decimal(r['weight_pct'])
+                    if r['weight_pct'] is not None
+                    else Decimal(0),
+                )
+                for r in top_rows
+            ],
         )
