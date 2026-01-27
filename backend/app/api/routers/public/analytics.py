@@ -28,7 +28,7 @@ async def get_portfolio_snapshot_for_user(
 @router.get(
     '/{portfolio_id}/sectors',
     response_model=SectorDistributionResponse,
-    summary="Распределение портфеля по секторам."
+    summary='Распределение портфеля по секторам.',
 )
 async def get_portfolio_sectors_distribution_for_user(
     portfolio_id: int,
@@ -43,7 +43,7 @@ async def get_portfolio_sectors_distribution_for_user(
 @router.get(
     '/{portfolio_id}/dynamics/24h',
     response_model=PortfolioDynamicsResponse,
-    summary="Динамика портфеля за последние 24 часа"
+    summary='Динамика портфеля за последние 24 часа',
 )
 async def get_portfolio_dynamics_for_user(
     portfolio_id: int,
