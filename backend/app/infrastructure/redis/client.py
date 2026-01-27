@@ -1,5 +1,5 @@
-from redis.asyncio import Redis
 from app.core.config import settings
+from redis.asyncio import Redis
 
 
 def create_redis() -> Redis:

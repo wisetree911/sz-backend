@@ -2,10 +2,10 @@ from app.api.routers.adm import routers as admin_routers
 from app.api.routers.public import routers as public_routers
 from app.core.logging import configure_logging_dev
 from app.core.middleware import request_logging_middleware
+from app.infrastructure.redis.client import close_redis, create_redis
 from app.ws.routes import ws_router
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.infrastructure.redis.client import close_redis, create_redis
 
 configure_logging_dev(log_level='INFO')
 

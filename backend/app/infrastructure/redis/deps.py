@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import cast
+
 from fastapi import Request
 from redis.asyncio import Redis
 

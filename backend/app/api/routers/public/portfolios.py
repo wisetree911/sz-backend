@@ -1,6 +1,6 @@
-from http.client import HTTPException
-
 from app.api.dependencies import get_current_user, get_portfolio_service
+from app.infrastructure.redis.deps import get_cache
+from app.infrastructure.redis.redis_cache import RedisCache
 from app.schemas.portfolio import (
     PortfolioCreatePublic,
     PortfolioResponseAdm,
@@ -8,8 +8,6 @@ from app.schemas.portfolio import (
 )
 from app.services.portfolios import PortfolioService
 from fastapi import APIRouter, Depends, status
-from app.infrastructure.redis.deps import get_cache
-from app.infrastructure.redis.redis_cache import RedisCache
 
 router = APIRouter(prefix='/portfolios', tags=['Portfolios'])
 

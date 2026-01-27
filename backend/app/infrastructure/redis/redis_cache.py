@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
+from typing import Any
+
 from redis.asyncio import Redis
 
 
@@ -13,7 +14,7 @@ class RedisCache:
     def _k(self, key: str) -> str:
         return f'{self._p}:cache:{key}'
 
-    async def get_json(self, key: str) -> Optional[Any]:
+    async def get_json(self, key: str) -> Any | None:
         val = await self._r.get(self._k(key))
         return None if val is None else json.loads(val)
 
