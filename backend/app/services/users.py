@@ -1,13 +1,10 @@
 from app.schemas.user import UserCreateAdm, UserUpdateAdm
 from fastapi import HTTPException
-from shared.repositories.user import UserRepository
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UserService:
-    def __init__(self, session: AsyncSession):
-        self.session = session
-        self.repo = UserRepository(session=session)
+    def __init__(self, repo):
+        self.repo = repo
 
     async def get_all(self):
         return await self.repo.get_all()

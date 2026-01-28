@@ -1,4 +1,4 @@
-from app.contracts.repos import PortfolioRepo, TradeRepo
+from app.contracts.repos import PortfolioRepo, TradeRepo, UserRepo
 from app.core.config import settings
 from app.infrastructure.db import get_session
 from app.services.analytics import AnalyticsService
@@ -12,6 +12,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from shared.repositories.portfolio import PortfolioRepository
 from shared.repositories.trade import TradeRepository
+from shared.repositories.user import UserRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -33,8 +34,12 @@ async def get_trade_service(repo: TradeRepo = Depends(get_trade_repo)) -> TradeS
     return TradeService(repo=repo)
 
 
-def get_user_service(session: AsyncSession = Depends(get_session)) -> UserService:
-    return UserService(session=session)
+async def get_user_repo(session: AsyncSession = Depends(get_session)) -> UserRepo:
+    return UserRepository(session=session)
+
+
+async def get_user_service(repo: UserRepo = Depends(get_user_repo)) -> UserService:
+    return UserService(repo=repo)
 
 
 def get_asset_service(session: AsyncSession = Depends(get_session)) -> AssetService:
