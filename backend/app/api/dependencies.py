@@ -1,4 +1,4 @@
-from app.contracts.repos import PortfolioRepo, TradeRepo, UserRepo
+from app.contracts.repos import PortfolioRepository, TradeRepoRepository, UserRepoRepository
 from app.core.config import settings
 from app.infrastructure.db import get_session
 from app.services.analytics import AnalyticsService
@@ -16,29 +16,29 @@ from shared.repositories.user import UserRepositoryPostgres
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-async def get_portfolio_repo(session: AsyncSession = Depends(get_session)) -> PortfolioRepo:
+async def get_portfolio_repo(session: AsyncSession = Depends(get_session)) -> PortfolioRepository:
     return PortfolioRepositoryPostgres(session=session)
 
 
 async def get_portfolio_service(
-    repo: PortfolioRepo = Depends(get_portfolio_repo),
+    repo: PortfolioRepository = Depends(get_portfolio_repo),
 ) -> PortfolioService:
     return PortfolioService(repo=repo)
 
 
-async def get_trade_repo(session: AsyncSession = Depends(get_session)) -> TradeRepo:
+async def get_trade_repo(session: AsyncSession = Depends(get_session)) -> TradeRepoRepository:
     return TradeRepositoryPostgres(session=session)
 
 
-async def get_trade_service(repo: TradeRepo = Depends(get_trade_repo)) -> TradeService:
+async def get_trade_service(repo: TradeRepoRepository = Depends(get_trade_repo)) -> TradeService:
     return TradeService(repo=repo)
 
 
-async def get_user_repo(session: AsyncSession = Depends(get_session)) -> UserRepo:
+async def get_user_repo(session: AsyncSession = Depends(get_session)) -> UserRepoRepository:
     return UserRepositoryPostgres(session=session)
 
 
-async def get_user_service(repo: UserRepo = Depends(get_user_repo)) -> UserService:
+async def get_user_service(repo: UserRepoRepository = Depends(get_user_repo)) -> UserService:
     return UserService(repo=repo)
 
 
