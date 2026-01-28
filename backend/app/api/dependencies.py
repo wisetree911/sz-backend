@@ -1,6 +1,6 @@
 from app.contracts.repos import PortfolioRepository, TradeRepoRepository, UserRepoRepository
 from app.core.config import settings
-from app.infrastructure.db import get_session
+from app.infrastructure.db.database import get_session
 from app.services.analytics import AnalyticsService
 from app.services.assets import AssetService
 from app.services.auth import AuthService

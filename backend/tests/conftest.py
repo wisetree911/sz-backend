@@ -4,7 +4,7 @@ from collections.abc import AsyncIterator
 import pytest
 from alembic import command
 from alembic.config import Config
-from app.infrastructure.db import get_session
+from app.infrastructure.db.database import get_session
 from app.main import app
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import (
