@@ -16,8 +16,8 @@
   - Достает данные из MOEX API
   - Обновляет в PostgreSQL
   - Публикует обновления через Redis
-- PostgreSQL — основное хранилище
-- Redis — кэш + pub/sub
+- PostgreSQL - основное хранилище
+- Redis - кэш, pub/sub в скором времени
 
 #  QUICKSTART
 
