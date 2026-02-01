@@ -1,5 +1,4 @@
 from app.contracts.repos import PortfolioRepository, TradeRepoRepository, UserRepoRepository
-from app.core.config import settings
 from app.infrastructure.db.database import get_session
 from app.repositories import (
     PortfolioRepositoryPostgres,
@@ -12,9 +11,7 @@ from app.services.auth import AuthService
 from app.services.portfolios import PortfolioService
 from app.services.trades import TradeService
 from app.services.users import UserService
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -58,29 +55,29 @@ def get_auth_service(session: AsyncSession = Depends(get_session)) -> AuthServic
     return AuthService(session=session)
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/auth/login')
-
-
-async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    service: UserService = Depends(get_user_service),
-):
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-
-        if payload.get('type') != 'access':  # чтобы точно на рефреше не получили ничего
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token type'
-            )
-
-        user_id = payload.get('sub')
-        if not user_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    except JWTError as err:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED) from err
-
-    user = await service.get_by_id(int(user_id))
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    return user
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/auth/login')
+#
+#
+# async def get_current_user(
+#     token: str = Depends(oauth2_scheme),
+#     service: UserService = Depends(get_user_service),
+# ):
+#     try:
+#         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+#
+#         if payload.get('type') != 'access':  # чтобы точно на рефреше не получили ничего
+#             raise HTTPException(
+#                 status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token type'
+#             )
+#
+#         user_id = payload.get('sub')
+#         if not user_id:
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+#
+#     except JWTError as err:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED) from err
+#
+#     user = await service.get_by_id(int(user_id))
+#     if not user:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+#     return user

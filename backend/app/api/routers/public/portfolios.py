@@ -1,4 +1,5 @@
-from app.api.dependencies import get_current_user, get_portfolio_service
+from app.api.dependencies import get_portfolio_service
+from app.core.security.dependencies import get_current_user
 from app.schemas.portfolio import (
     PortfolioCreatePublic,
     PortfolioResponseAdm,

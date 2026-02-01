@@ -1,4 +1,5 @@
-from app.api.dependencies import get_current_user, get_user_service
+from app.api.dependencies import get_user_service
+from app.core.security.dependencies import get_current_user
 from app.schemas.user import UserResponsePublic, UserUpdatePublic
 from app.services.users import UserService
 from fastapi import APIRouter, Depends, status
