@@ -15,8 +15,8 @@ from app.core.security.security import (
 from app.models import RefreshSession
 from app.repositories import UserRepositoryPostgres
 from app.repositories.refresh_session import RefreshSessionRepositoryPostgres
-from app.schemas.auth import LogoutIn, RefreshIn, RefreshSessionCreate, RegisterIn, Token
-from app.schemas.user import UserCreateAdm, UserResponsePublic
+from app.schemas.auth import LogoutIn, RefreshIn, RefreshSessionCreate, Token
+from app.schemas.user import UserCreateAdm, UserRegister, UserResponsePublic
 from fastapi import HTTPException, status
 from jose import JWTError
 
@@ -102,7 +102,7 @@ class AuthService:
 
         await self.rs_repo.set_revoke_by_jti(jti=jti)
 
-    async def register(self, payload: RegisterIn):
+    async def register(self, payload: UserRegister):
         existing = await self.user_repo.get_by_email(payload.email)
         if existing:
             raise HTTPException(status_code=409, detail='User already exists')

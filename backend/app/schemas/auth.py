@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict
 from pydantic.types import AwareDatetime
 
 
@@ -20,10 +20,10 @@ class RefreshIn(APIModel):
     refresh_token: str
 
 
-class RegisterIn(APIModel):
-    name: str
-    email: EmailStr
-    password: str
+# class UserRegister(APIModel):
+#     name: str
+#     email: EmailStr
+#     password: str
 
 
 class LogoutIn(APIModel):

@@ -1,7 +1,8 @@
 from typing import Annotated
 
 from app.api.dependencies import get_auth_service
-from app.schemas.auth import LogoutIn, RefreshIn, RegisterIn, Token
+from app.schemas.auth import LogoutIn, RefreshIn, Token
+from app.schemas.user import UserRegister
 from app.services.auth import AuthService
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -14,7 +15,7 @@ router = APIRouter(prefix='/auth', tags=['Auth'])
     status_code=status.HTTP_201_CREATED,
     summary='Регистрация пользователя',
 )
-async def register(payload: RegisterIn, service: AuthService = Depends(get_auth_service)):
+async def register(payload: UserRegister, service: AuthService = Depends(get_auth_service)):
     return await service.register(payload=payload)
 
 
