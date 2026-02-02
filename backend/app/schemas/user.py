@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from enum import Enum
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from pydantic.types import AwareDatetime
 
 
@@ -10,9 +12,15 @@ class APIModel(BaseModel):
     )
 
 
+class Role(str, Enum):
+    admin = 'admin'
+    user = 'user'
+
+
 class UserFields(APIModel):
     name: str
     email: EmailStr
+    role: Role = Field(default=Role.user)
 
 
 class UserCreatePublic(UserFields):
