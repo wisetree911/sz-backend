@@ -23,7 +23,8 @@
 
 #  QUICKSTART
 
-docker compose --env-file .env.example up -d --build
+cp .env.example .env
+docker compose up -d --build
 
 После запуска Swagger будет доступен по http://localhost:8000/docs
 
