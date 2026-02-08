@@ -53,31 +53,3 @@ def get_analytics_service(
 
 def get_auth_service(session: AsyncSession = Depends(get_session)) -> AuthService:
     return AuthService(session=session)
-
-
-# get_access_token = OAuth2PasswordBearer(tokenUrl='/api/auth/login')
-#
-#
-# async def get_current_user(
-#     token: str = Depends(get_access_token),
-#     service: UserService = Depends(get_user_service),
-# ):
-#     try:
-#         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-#
-#         if payload.get('type') != 'access':  # чтобы точно на рефреше не получили ничего
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token type'
-#             )
-#
-#         user_id = payload.get('sub')
-#         if not user_id:
-#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-#
-#     except JWTError as err:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED) from err
-#
-#     user = await service.get_by_id(int(user_id))
-#     if not user:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-#     return user
